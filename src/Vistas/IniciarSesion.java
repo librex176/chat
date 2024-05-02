@@ -87,3 +87,4 @@ public class IniciarSesion extends JFrame {
         this.pack();
     }
 }
+// despues poner un metodo aqui que cuando inicie sesion le mande a ListasMenu guiMenu = new ListasMenu(userId) -> userid del usuario que se acaba de iniciar sesion
