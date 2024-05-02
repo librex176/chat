@@ -79,6 +79,7 @@ public class ListasMenu extends JFrame{
                 // mandar el userId que está iniciado sesion
                 ListaAmigos listAmigosView = new ListaAmigos(userId);
                 listAmigosView.setVisible(true);
+                dispose();
             }
         });
         
@@ -87,8 +88,9 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                ListaAmigos listAmigosView = new ListaAmigos(userId);
+                ListaConectados listAmigosView = new ListaConectados(userId);
                 listAmigosView.setVisible(true);
+                dispose();
             }
         });
         
@@ -97,8 +99,9 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                ListaAmigos listAmigosView = new ListaAmigos(userId);
+                ListaGrupos listAmigosView = new ListaGrupos(userId);
                 listAmigosView.setVisible(true);
+                dispose();
             }
         });
         

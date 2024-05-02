@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bd;
+package Controllers;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Amigos;
+import bd.BD;
 
 /**
  *
@@ -20,13 +21,13 @@ public class AmigosController extends BD{
         
     public String selectNameByUserId(int usuarioId)
     {
-        
+        BD bd = new BD();
         PreparedStatement sql;
         String nombre = null;
         ResultSet r;
         try
         {
-            sql = getCon().prepareStatement("SELECT NombreUsuario FROM usuarios WHERE UsuarioId=?");
+            sql = bd.getCon().prepareStatement("SELECT NombreUsuario FROM usuarios WHERE UsuarioId=?");
             
             sql.setInt(1,usuarioId);
             r = sql.executeQuery();

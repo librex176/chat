@@ -25,7 +25,7 @@ public class Chat {
 //        guiMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
 //        guiMenu.setVisible(true); // Hacer visible la ventana JFrame
         
-        IniciarSesion gui = new IniciarSesion();
+        ListasMenu gui = new ListasMenu(1);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
         gui.setVisible(true); // Hacer visible la ventana JFrame
 

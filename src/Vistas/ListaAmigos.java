@@ -4,10 +4,13 @@
  */
 package Vistas;
 
-import bd.AmigosController;
+import Controllers.AmigosController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -34,6 +37,7 @@ public class ListaAmigos extends JFrame{
         super();
         this.userId = userId;
         init();
+        addWindowListener();
     }
     
     private void init() {
@@ -119,4 +123,18 @@ public class ListaAmigos extends JFrame{
         setLocationRelativeTo(null); // centrar la ventana en la pantalla
     }
         
+     
+    private void addWindowListener() {
+        // Crear una instancia del WindowListener
+        WindowListener windowListener = new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
+                ListasMenu listasMenu = new ListasMenu(userId);
+                listasMenu.setVisible(true);
+            }
+        };
+
+        this.addWindowListener(windowListener);
+    }
 }
