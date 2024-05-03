@@ -2,6 +2,7 @@
 package chat;
 import Vistas.IniciarSesion;
 import Vistas.ListasMenu;
+import Vistas.RegistrarUsuario;
 import bd.BD;
 import java.sql.Connection;
 
@@ -25,9 +26,17 @@ public class Chat {
 //        guiMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
 //        guiMenu.setVisible(true); // Hacer visible la ventana JFrame
         
-        ListasMenu gui = new ListasMenu(1);
+//        ListasMenu gui = new ListasMenu(1);
+//        gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
+//        gui.setVisible(true); // Hacer visible la ventana JFrame
+
+        IniciarSesion gui = new IniciarSesion();
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
         gui.setVisible(true); // Hacer visible la ventana JFrame
+
+//        RegistrarUsuario gui = new RegistrarUsuario();
+//        gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre
+//        gui.setVisible(true); // Hacer visible la ventana JFrame
 
     }
     

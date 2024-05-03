@@ -19,7 +19,22 @@ import bd.BD;
  * @author david
  */
 public class UsuarioController {
-    
+    //Insertar un usuario
+    public void insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita) {
+        BD bd = new BD();
+        PreparedStatement sql;
+        try {
+            sql = bd.getCon().prepareStatement("INSERT INTO usuarios (NombreUsuario, Pass, RespuestaPreguntaConfianza) VALUES (?, ?, ?)");
+            sql.setString(1, nombreUsuario);
+            sql.setString(2, contraseña);
+            sql.setString(3, cancionFavorita);
+            sql.executeUpdate();
+            // Cerrar la conexión después de ejecutar la consulta
+            bd.closeConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public ArrayList<Usuarios> usuariosPorConexion(int conexion, int usuarioId)
     {
         BD bd = new BD();
@@ -37,7 +52,7 @@ public class UsuarioController {
             while(r.next())
             {
                 Usuarios x = new Usuarios();
-                x.nombreUsuario = r.getString("NombreUsuario");
+                x.nombreUsuario = r.getString("NombreUsuariAo");
                 x.usuarioId = r.getInt("UsuarioId");
                 usuarios.add(x);
             }
