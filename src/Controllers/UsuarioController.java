@@ -45,10 +45,11 @@ public class UsuarioController {
         BD bd = new BD();
         PreparedStatement sql;
         try {
-            sql = bd.getCon().prepareStatement("INSERT INTO usuarios (NombreUsuario, Pass, RespuestaPreguntaConfianza) VALUES (?, ?, ?)");
+            sql = bd.getCon().prepareStatement("INSERT INTO usuarios (NombreUsuario, Pass, RespuestaPreguntaConfianza, StatusConexion) VALUES (?, ?, ?, ?)");
             sql.setString(1, nombreUsuario);
             sql.setString(2, contraseña);
             sql.setString(3, cancionFavorita);
+            sql.setString(4, "0");
             int comprobar = sql.executeUpdate();
             
             bd.closeConnection();
@@ -76,7 +77,7 @@ public class UsuarioController {
             while(r.next())
             {
                 Usuarios x = new Usuarios();
-                x.nombreUsuario = r.getString("NombreUsuariAo");
+                x.nombreUsuario = r.getString("NombreUsuario");
                 x.usuarioId = r.getInt("UsuarioId");
                 usuarios.add(x);
             }
@@ -150,5 +151,34 @@ public class UsuarioController {
             bd.closeConnection();
         }
         return NombreUsuario;
+    }
+    
+    public boolean ChangeStatus(int UserId, boolean status)
+    {
+        BD bd = new BD();
+        PreparedStatement sql;
+        try {
+            sql = bd.getCon().prepareStatement("UPDATE usuarios SET StatusConexion = ? WHERE UsuarioId = ?");
+            if (status)
+            {
+                sql.setInt(1, 1);
+            }
+            else
+            {
+                sql.setInt(1, 0);
+            }
+            
+            sql.setInt(2, UserId);
+            int comprobar = sql.executeUpdate();
+            
+            bd.closeConnection();
+           
+            return comprobar > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            return false; 
+        } finally {
+            bd.closeConnection();
+        }
     }
 }

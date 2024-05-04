@@ -140,6 +140,10 @@ public class ListaConectados extends JFrame {
                         // Mostrar un mensaje con el nombre seleccionado
                         JOptionPane.showMessageDialog(null, "Has seleccionado: " + nombreSeleccionado+ " tiene el userId: "+userConectadoId+" y tu tienes el userId: "+userId);
                         // aqui en lugar del mensaje abrir la mensajeria y mandar los dos users (userId, userConectadoId)
+                        
+                        ChatIndividual chat = new ChatIndividual(userId, userConectadoId, nombreSeleccionado);
+                        chat.setVisible(true);
+                        dispose();
                     }
                 }
             }

@@ -110,6 +110,7 @@ public class IniciarSesion extends JFrame {
             if (credencialesValidas) {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
+                usuarioController.ChangeStatus(usuarioId, true);
                 ListasMenu gui = new ListasMenu(usuarioId);
                 gui.setVisible(true);
                 // Hacer invisible esta ventana
@@ -127,10 +128,7 @@ public class IniciarSesion extends JFrame {
             
             RestablecerContraseña ventanaRestablecerContraseña = new RestablecerContraseña();
             ventanaRestablecerContraseña.setVisible(true);
-            
         }
-        
         });
-
     }
 }
