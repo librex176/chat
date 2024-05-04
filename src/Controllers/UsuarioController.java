@@ -181,4 +181,23 @@ public class UsuarioController {
             bd.closeConnection();
         }
     }
+    
+    public boolean cerrarSesion(int UserId){
+        BD bd = new BD();
+        PreparedStatement sql;
+        try{
+            sql = bd.getCon().prepareStatement("UPDATE usuarios SET StatusConexion = ? WHERE UsuarioId = ?"); 
+            sql.setInt(1, 0);
+            sql.setInt(2, UserId);
+
+            int comprobar = sql.executeUpdate();
+
+            return comprobar > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } finally {
+            bd.closeConnection();
+        }
+    }
 }

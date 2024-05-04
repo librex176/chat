@@ -1,16 +1,18 @@
 
 package Vistas;
 
+import Controllers.UsuarioController;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 public class ListasMenu extends JFrame{
-    JButton amigos, conectados, grupos, verSolicitudes;
+    JButton amigos, conectados, grupos, verSolicitudes, cerrarSesion;
     int userId;
     
     public ListasMenu() {
@@ -43,6 +45,7 @@ public class ListasMenu extends JFrame{
         conectados = new JButton("Ver todos");
         grupos = new JButton("Mis grupos");
         verSolicitudes = new JButton("Ver Solicitudes");
+        cerrarSesion = new JButton("Cerrar Sesion");
         
 // group layouts
         
@@ -53,6 +56,7 @@ public class ListasMenu extends JFrame{
                 .addComponent(conectados, 20, 200, 400)
                 .addComponent(grupos, 20, 200, 400)
                 .addComponent(verSolicitudes, 20, 200, 400)
+                .addComponent(cerrarSesion, 20, 200, 400)
         );
         
         // configurar el diseño vertical
@@ -62,6 +66,7 @@ public class ListasMenu extends JFrame{
                 .addComponent(conectados)
                 .addComponent(grupos)
                 .addComponent(verSolicitudes)
+                .addComponent(cerrarSesion)
         );
         
 // eventos
@@ -106,6 +111,21 @@ public class ListasMenu extends JFrame{
                 RequestsMenu View = new RequestsMenu(userId);
                 View.setVisible(true);
                 dispose();
+            }
+        });
+        
+        cerrarSesion.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                UsuarioController usuarioController = new UsuarioController();
+                boolean cerradoExitosamente = usuarioController.cerrarSesion(userId); 
+                if (cerradoExitosamente) {
+                    IniciarSesion gui = new IniciarSesion();
+                    gui.setVisible(true);
+                    setVisible(false);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Error al cerrar sesión"); 
+                }
             }
         });
         
