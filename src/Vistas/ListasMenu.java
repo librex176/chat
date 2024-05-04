@@ -19,7 +19,7 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  * @author Valeria
  */
 public class ListasMenu extends JFrame{
-    JButton amigos, conectados, grupos;
+    JButton amigos, conectados, grupos, verSolicitudes;
     int userId;
     
     public ListasMenu() {
@@ -51,6 +51,7 @@ public class ListasMenu extends JFrame{
         amigos = new JButton("Mis Amigos");
         conectados = new JButton("Ver todos");
         grupos = new JButton("Mis grupos");
+        verSolicitudes = new JButton("Ver Solicitudes");
         
 // group layouts
         
@@ -60,6 +61,7 @@ public class ListasMenu extends JFrame{
                 .addComponent(amigos, 20, 200, 400)
                 .addComponent(conectados, 20, 200, 400)
                 .addComponent(grupos, 20, 200, 400)
+                .addComponent(verSolicitudes, 20, 200, 400)
         );
         
         // configurar el diseño vertical
@@ -68,6 +70,7 @@ public class ListasMenu extends JFrame{
                 .addComponent(amigos)
                 .addComponent(conectados)
                 .addComponent(grupos)
+                .addComponent(verSolicitudes)
         );
         
 // eventos
@@ -101,6 +104,16 @@ public class ListasMenu extends JFrame{
                 // mandar el userId que está iniciado sesion
                 ListaGrupos listAmigosView = new ListaGrupos(userId);
                 listAmigosView.setVisible(true);
+                dispose();
+            }
+        });
+        
+        verSolicitudes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // mandar el userId que está iniciado sesion
+                RequestsMenu View = new RequestsMenu(userId);
+                View.setVisible(true);
                 dispose();
             }
         });

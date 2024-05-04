@@ -87,4 +87,68 @@ public class UsuarioController {
         }
         return null;
     }
+    
+    public int RetornarId(String nombreUsuario, String contraseña) {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        int userId = -1; // Valor predeterminado si las credenciales son incorrectas
+        try {
+            sql = bd.getCon().prepareStatement("SELECT UsuarioId FROM usuarios WHERE NombreUsuario = ? AND Pass = ?");
+            sql.setString(1, nombreUsuario);
+            sql.setString(2, contraseña);
+            res = sql.executeQuery();
+            
+            if (res.next()) {
+                userId = res.getInt("UsuarioId");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bd.closeConnection();
+        }
+        return userId;
+    }
+    
+    public int EncontrarUsuarios(String nombreUsuario) {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        int userId = -1; // Valor predeterminado si las credenciales son incorrectas
+        try {
+            sql = bd.getCon().prepareStatement("SELECT UsuarioId FROM usuarios WHERE NombreUsuario = ?");
+            sql.setString(1, nombreUsuario);
+            res = sql.executeQuery();
+            
+            if (res.next()) {
+                userId = res.getInt("UsuarioId");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bd.closeConnection();
+        }
+        return userId;
+    }
+    
+    public String RetornarUsername(int UsuarioId) {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        String NombreUsuario = "";
+        try {
+            sql = bd.getCon().prepareStatement("SELECT NombreUsuario FROM usuarios WHERE UsuarioId = ?");
+            sql.setInt(1, UsuarioId);
+            res = sql.executeQuery();
+            
+            if (res.next()) {
+                NombreUsuario = res.getString("NombreUsuario");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bd.closeConnection();
+        }
+        return NombreUsuario;
+    }
 }

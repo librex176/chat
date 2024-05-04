@@ -85,6 +85,7 @@ public class IniciarSesion extends JFrame {
 
         setLayout(orden);
         this.pack();
+        setLocationRelativeTo(null);
         
         Registrar.addActionListener(new ActionListener() {
             @Override
@@ -103,11 +104,16 @@ public class IniciarSesion extends JFrame {
             
             UsuarioController usuarioController = new UsuarioController();
             boolean credencialesValidas = usuarioController.verificarCredenciales(nombreUsuario, contraseña);
+            int usuarioId = usuarioController.RetornarId(nombreUsuario, contraseña);
 
             // Verificar si las credenciales son validas
             if (credencialesValidas) {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
+                ListasMenu gui = new ListasMenu(usuarioId);
+                gui.setVisible(true);
+                // Hacer invisible esta ventana
+                setVisible(false);
             } else {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Datos incorrectos");

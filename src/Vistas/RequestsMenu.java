@@ -3,83 +3,82 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Vistas;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
- * @author Valeria
+ * @author Samantha
  */
-public class ListaGrupos extends JFrame {
-    JButton enviarSolicitud;
+public class RequestsMenu extends JFrame{
+    JButton btnSolicitudesAmigos, btnSolicitudesGrupos;
     int userId;
-    
-    public ListaGrupos(int userId)
-    {
+    public RequestsMenu(int userId) {
         super();
-        this.userId = userId;
-        init();
+        this.userId  = userId;
+        initComponents();
         addWindowListener();
     }
-     
-    private void init()
-    {
-        setTitle("Lista de mis grupos");
+
+    private void initComponents() {
+        setTitle("Lista de solicitudes de amigos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.LIGHT_GRAY);
         
-        // crear groupLayout
+        // Crear el layout principal
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        
-        // establecer el auto ajuste de gaps
         layout.setAutoCreateContainerGaps(true);
         layout.setAutoCreateGaps(true);
         
+         btnSolicitudesAmigos = new JButton("Ver Solicitudes de Amigos");
+         btnSolicitudesGrupos = new JButton("Ver Solicitudes de Grupos");
         
-        enviarSolicitud = new JButton("Crear Grupo");
-        
-        // Crear un contenedor para el JList
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        
+        // Agregar el panel de amigos al layout
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addComponent(enviarSolicitud, 20, 200, 400)
+                .addComponent(btnSolicitudesAmigos, 20, 200, 400)
+                .addComponent(btnSolicitudesGrupos, 20, 200, 400)
         );
-        
-        // configurar el diseño vertical
+
         layout.setVerticalGroup(
             layout.createSequentialGroup()
-                .addComponent(enviarSolicitud)
+                .addComponent(btnSolicitudesAmigos)
+                .addComponent(btnSolicitudesGrupos)
         );
-        
-        
-        enviarSolicitud.addActionListener(new ActionListener() {
+
+       
+        btnSolicitudesAmigos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Redirigir a SendRequestForm y pasar userId
-                CreateGroups createGroups = new CreateGroups(userId);
-                createGroups.setVisible(true);
+                FriendsRequests requestsFriends = new FriendsRequests(userId);
+                requestsFriends.setVisible(true);
                 dispose();
             }
         });
+
         
-        pack(); // ajustar el tamaño de la ventana según el contenido
-        setLocationRelativeTo(null); // centrar la ventana en la pantalla
-        
+        btnSolicitudesGrupos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GroupRequests groupRequests = new GroupRequests(userId);
+                groupRequests.setVisible(true);
+                dispose();
+            }
+        });
+
+        add(btnSolicitudesAmigos);
+        add(btnSolicitudesGrupos);
+
+        pack();
+        setLocationRelativeTo(null);
     }
+    
     private void addWindowListener() {
         // Crear una instancia del WindowListener
         WindowListener windowListener = new WindowAdapter() {

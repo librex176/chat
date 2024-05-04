@@ -8,12 +8,15 @@ import Controllers.AmigosController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,6 +34,7 @@ import models.Amigos;
  */
 public class ListaAmigos extends JFrame{
     JLabel a;
+    JButton enviarSolicitud;
     int userId;
     
     public ListaAmigos(int userId) {
@@ -58,6 +62,8 @@ public class ListaAmigos extends JFrame{
         a = new JLabel("Mis Amigos");
         Font font = new Font("Arial", Font.BOLD, 30);
         a.setFont(font);
+        enviarSolicitud = new JButton("Enviar Solicitud");
+        
         
         // creando array list con los usernames
         
@@ -86,6 +92,7 @@ public class ListaAmigos extends JFrame{
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(a, 20, 100, 300)
                 .addComponent(panel)
+                .addComponent(enviarSolicitud, 20, 200, 400)
         );
         
         // configurar el diseño vertical
@@ -93,6 +100,7 @@ public class ListaAmigos extends JFrame{
             layout.createSequentialGroup()
                 .addComponent(a)
                 .addComponent(panel)
+                .addComponent(enviarSolicitud)
         );
         
         
@@ -115,6 +123,16 @@ public class ListaAmigos extends JFrame{
                         JOptionPane.showMessageDialog(null, "Has seleccionado: " + nombreSeleccionado+ " tiene el userId: "+userFriendId+" y tu tienes el userId: "+userId);
                     }
                 }
+            }
+        });
+        
+        enviarSolicitud.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Redirigir a SendRequestForm y pasar userId
+                SendRequestForm SendRequestForm = new SendRequestForm(userId);
+                SendRequestForm.setVisible(true);
+                dispose();
             }
         });
         
