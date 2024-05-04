@@ -19,8 +19,29 @@ import bd.BD;
  * @author david
  */
 public class UsuarioController {
+    //Validar inicio de sesion
+    public boolean verificarCredenciales(String nombreUsuario, String contraseña) {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        try {
+            sql = bd.getCon().prepareStatement("SELECT * FROM usuarios WHERE NombreUsuario = ? AND Pass = ?");
+            sql.setString(1, nombreUsuario);
+            sql.setString(2, contraseña);
+            res = sql.executeQuery();
+            
+            
+            return res.next();
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            return false; 
+        } finally {
+            
+            bd.closeConnection();
+        }
+    }
     //Insertar un usuario
-    public void insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita) {
+    public boolean insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita) {
         BD bd = new BD();
         PreparedStatement sql;
         try {
@@ -28,11 +49,14 @@ public class UsuarioController {
             sql.setString(1, nombreUsuario);
             sql.setString(2, contraseña);
             sql.setString(3, cancionFavorita);
-            sql.executeUpdate();
-            // Cerrar la conexión después de ejecutar la consulta
+            int comprobar = sql.executeUpdate();
+            
             bd.closeConnection();
+           
+            return comprobar > 0;
         } catch (SQLException ex) {
             Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            return false; 
         }
     }
     public ArrayList<Usuarios> usuariosPorConexion(int conexion, int usuarioId)

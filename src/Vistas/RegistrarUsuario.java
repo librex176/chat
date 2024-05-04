@@ -11,6 +11,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
@@ -86,18 +87,29 @@ public class RegistrarUsuario extends JFrame {
         });
         
         registrar.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Obtener los datos de los campos de texto
-            String nombreUsuario = usuario.getText();
-            String contraseña = pass.getText();
-            String cancionFavorita = respuestaPregunta.getText();
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Obtener los datos de los campos de texto
+                String nombreUsuario = usuario.getText();
+                String contraseña = pass.getText();
+                String cancionFavorita = respuestaPregunta.getText();
 
-            // Instanciar el controlador de usuarios
-            UsuarioController usuarioController = new UsuarioController();
+                // Instanciar el controlador de usuarios
+                UsuarioController usuarioController = new UsuarioController();
 
-            // Llamar al método para insertar el usuario en la base de datos
-            usuarioController.insertarUsuario(nombreUsuario, contraseña, cancionFavorita);
+                // Llamar al método para insertar el usuario en la base de datos
+                boolean registroExitoso = usuarioController.insertarUsuario(nombreUsuario, contraseña, cancionFavorita);
+                
+                // Verificar si el registro fue exitoso
+                if (registroExitoso) {
+                    // Mostrar mensaje de éxito
+                    JOptionPane.showMessageDialog(RegistrarUsuario.this, "¡Usuario registrado correctamente!");
+                    // Cerrar la ventana
+                    dispose();
+                } else {
+                    // Mostrar mensaje de error
+                    JOptionPane.showMessageDialog(RegistrarUsuario.this, "Error al registrar usuario. Por favor, inténtelo de nuevo.");
+                }
             }
         });
 

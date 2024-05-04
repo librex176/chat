@@ -1,24 +1,26 @@
 package Vistas;
 
+import Controllers.UsuarioController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class IniciarSesion extends JFrame {
-    private JTextField textField1 = new JTextField(10);
     
+    private JTextField textField1 = new JTextField(10);
     private JTextField textField2 = new JTextField(10);
     private JButton IniciarSesion = new JButton("Iniciar Sesion");
     private JButton RestablecerPass = new JButton("Olvide la contraseña");
     private JButton Registrar = new JButton("Registrarme");
-    JLabel etiqueta1 = new JLabel("Usuario:");
-    JLabel etiqueta2 = new JLabel("Contraseña");
+    private JLabel etiqueta1 = new JLabel("Usuario:");
+    private JLabel etiqueta2 = new JLabel("Contraseña");
 
-    //Funcionalidades de los botones
+    
     public IniciarSesion() {
         
         
@@ -31,7 +33,7 @@ public class IniciarSesion extends JFrame {
         orden.setAutoCreateContainerGaps(true);
         orden.setAutoCreateGaps(true);
 
-        // Definición de grupos secuenciales y paralelos para disposición vertical
+        //Acomodo de los layout  PV
         orden.setVerticalGroup(orden.createSequentialGroup()
                 .addGroup(
                     orden.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -55,7 +57,7 @@ public class IniciarSesion extends JFrame {
                 )
         );
 
-        // Definición de grupos secuenciales y paralelos para disposición horizontal
+        //PH
         orden.setHorizontalGroup(orden.createParallelGroup()
                 .addGroup(
                     orden.createSequentialGroup()
@@ -87,11 +89,42 @@ public class IniciarSesion extends JFrame {
         Registrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Instanciar y mostrar la ventana RegistrarUsuario
+                
                 RegistrarUsuario ventanaRegistrar = new RegistrarUsuario();
                 ventanaRegistrar.setVisible(true);
             }
         });
+        IniciarSesion.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String nombreUsuario = textField1.getText();
+            String contraseña = textField2.getText();
+
+            
+            UsuarioController usuarioController = new UsuarioController();
+            boolean credencialesValidas = usuarioController.verificarCredenciales(nombreUsuario, contraseña);
+
+            // Verificar si las credenciales son validas
+            if (credencialesValidas) {
+                
+                JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
+            } else {
+                
+                JOptionPane.showMessageDialog(IniciarSesion.this, "Datos incorrectos");
+            }
+         }
+        
+        });
+        RestablecerPass.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            
+            RestablecerContraseña ventanaRestablecerContraseña = new RestablecerContraseña();
+            ventanaRestablecerContraseña.setVisible(true);
+            
+        }
+        
+        });
+
     }
 }
-// despues poner un metodo aqui que cuando inicie sesion le mande a ListasMenu guiMenu = new ListasMenu(userId) -> userid del usuario que se acaba de iniciar sesion
