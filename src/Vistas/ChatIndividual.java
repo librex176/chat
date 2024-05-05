@@ -1,6 +1,7 @@
 package Vistas;
 
 
+import Controllers.ChatsController;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,12 +26,13 @@ public class ChatIndividual extends JFrame {
     
     private JTextArea chatArea;
     private JTextField messageField;
+    ChatsController chatsController = new ChatsController();
     
     public ChatIndividual(int userId, int chatterSeleccionadoId, String chatterSeleccionadoNombre)
     {
         super();
-        this.userId = userId;
-        this.chatterId = chatterSeleccionadoId;
+        this.userId = userId; //Quien manda el mensaje
+        this.chatterId = chatterSeleccionadoId;//Recibe el mensaje
         this.chatterName = chatterSeleccionadoNombre;   
         init();
         addWindowListener();
@@ -91,8 +93,10 @@ public class ChatIndividual extends JFrame {
         if (!message.isEmpty()) {
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
+            chatsController.SendMessageToBD(message,userId,chatterId);
         }
     }
+
     
     private void addWindowListener() {
         // Crear una instancia del WindowListener
