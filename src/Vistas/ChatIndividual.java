@@ -81,6 +81,8 @@ public class ChatIndividual extends JFrame {
         
         getContentPane().add(panel);
         pack();
+        setLocationRelativeTo(null); // centrar la ventana en la pantalla
+        
         
         // listeners
         sendButton.addActionListener(new ActionListener() {
@@ -91,7 +93,7 @@ public class ChatIndividual extends JFrame {
         });
     }
     
-     private void sendMessage() {
+    private void sendMessage() {
         String message = messageField.getText();
         boolean registroExitoso = false;
         if (!message.isEmpty()) {
@@ -106,10 +108,6 @@ public class ChatIndividual extends JFrame {
             if (registroExitoso)
             {
                 chatId = chatsController.GetChatId(userId, chatterId);
-            }
-            else
-            {
-                return;
             }            
             
             messagesController.SendMessageToBD(message, chatId);

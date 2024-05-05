@@ -119,8 +119,9 @@ public class ListaAmigos extends JFrame{
                         String nombreSeleccionado = modeloLista.getElementAt(index);
                         int userFriendId = amigos.get(index).usuarioId;
                         
-                        // Mostrar un mensaje con el nombre seleccionado
-                        JOptionPane.showMessageDialog(null, "Has seleccionado: " + nombreSeleccionado+ " tiene el userId: "+userFriendId+" y tu tienes el userId: "+userId);
+                        ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado);
+                        chat.setVisible(true);
+                        dispose();
                     }
                 }
             }
