@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.swing.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
@@ -70,11 +71,21 @@ public class SendRequestForm extends JFrame{
                 String nombreUsuario = entrada.getText();
                 UsuarioController usuarioController = new UsuarioController();
                 int usuarioRecibeId = usuarioController.EncontrarUsuarios(nombreUsuario);
+                
                 if (usuarioRecibeId != -1) {
+                    //No se puede enviar a si mismo
+                    int idUsuarioActual = userId;
+                    if (usuarioRecibeId == idUsuarioActual) {
+                        JOptionPane.showMessageDialog(SendRequestForm.this, "No puedes enviarte una solicitud a ti mismo");
+                        return;
+                    }
                     // Usuario encontrado, enviar solicitud de amistad
                     RequestsController requestController = new RequestsController();
                     requestController.enviarSolicitudAmigos(userId, usuarioRecibeId);
                     JOptionPane.showMessageDialog(SendRequestForm.this, "Solicitud enviada a " + nombreUsuario);
+                    dispose();
+                    ListaAmigos listaAmigos = new ListaAmigos(userId);
+                    listaAmigos.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(SendRequestForm.this, "El usuario no existe");
                 }

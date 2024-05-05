@@ -8,15 +8,12 @@ import Controllers.RequestsController;
 import Controllers.UsuarioController;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -43,7 +40,7 @@ public class GroupRequests extends JFrame {
     private void initComponents() {
         RequestsController requestsController = new RequestsController();
 
-        ArrayList<Integer> solicitudesGrupos = requestsController.obtenerSolicitudesGrupos(userId);
+        ArrayList<String> solicitudesGrupos = requestsController.obtenerSolicitudesGrupos(userId);
 
         setTitle("Lista de solicitudes de grupos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -67,9 +64,6 @@ public class GroupRequests extends JFrame {
         JPanel gruposButtonPanel = new JPanel();
         gruposPanel.add(gruposButtonPanel, BorderLayout.SOUTH);
 
-        // Mapa para vincular las solicitudes con sus botones correspondientes
-        Map<Integer, JButton[]> buttonMap = new HashMap<>();
-
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(gruposPanel)
@@ -84,34 +78,48 @@ public class GroupRequests extends JFrame {
 
         // Llenar las listas con las solicitudes de grupos
         if (solicitudesGrupos != null) {
-            for (int i = 0; i < solicitudesGrupos.size(); i += 2) {
-                int usuarioEnviaId = solicitudesGrupos.get(i);
-                int invitacionId = solicitudesGrupos.get(i + 1);
+            for (int i = 0; i < solicitudesGrupos.size(); i += 3) {
+                String Nombre = solicitudesGrupos.get(i + 1);
+                String UsuarioDueno = solicitudesGrupos.get(i + 2);
+                int dueno = Integer.parseInt(UsuarioDueno);
                 UsuarioController usuarioController = new UsuarioController();
-                String username = usuarioController.RetornarUsername(usuarioEnviaId);
-                gruposListModel.addElement("Solicitud de grupo creada por Usuario ID: " + username);
+                String username = usuarioController.RetornarUsername(dueno);
+                gruposListModel.addElement("Solicitud de grupo: " + Nombre + " Creada por: " + username);
                 JButton aceptarGrupoButton = new JButton("Aceptar");
                 JButton rechazarGrupoButton = new JButton("Rechazar");
                 gruposButtonPanel.add(aceptarGrupoButton);
                 gruposButtonPanel.add(rechazarGrupoButton);
 
-                // Agregar los botones al mapa
-                buttonMap.put(invitacionId, new JButton[]{aceptarGrupoButton, rechazarGrupoButton});
-
                 aceptarGrupoButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        System.out.println("Se aceptó la solicitud de grupo con Invitacion ID: " + invitacionId);
-                        // Aquí puedes realizar las acciones necesarias para aceptar la solicitud de grupo
+                        // Obtener el índice seleccionado y el nombre del grupo
+                        int selectedIndex = gruposList.getSelectedIndex();
+                        if (selectedIndex != -1) {
+                            int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
+                            requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);
+                            dispose();
+                            RequestsMenu view = new RequestsMenu(userId);
+                            view.setVisible(true);
+                        }
                     }
                 });
+
                 rechazarGrupoButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        System.out.println("Se rechazó la solicitud de grupo con Invitacion ID: " + invitacionId);
-                        // Aquí puedes realizar las acciones necesarias para rechazar la solicitud de grupo
+                        int selectedIndex = gruposList.getSelectedIndex();
+                        if (selectedIndex != -1) {
+                            int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
+                            requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 3);
+                            dispose();
+                            RequestsMenu view = new RequestsMenu(userId);
+                            view.setVisible(true);
+                        }
                     }
-                });
+});
+
+
             }
         } else {
             gruposListModel.addElement("No hay solicitudes de grupos.");
@@ -122,6 +130,7 @@ public class GroupRequests extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
+
 
     private void addWindowListener() {
         // Crear una instancia del WindowListener

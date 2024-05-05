@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
@@ -29,7 +30,9 @@ public class CreateGroups extends JFrame {
     private ArrayList<JTextField> camposUsuarios;
     private JButton btnAgregarUsuario;
     private JButton btnCrearGrupo;
+    private JTextField campoNombreGrupo;
     int userId;
+    String Nombre;
 
     public CreateGroups(int userId) {
         this.userId  = userId;
@@ -47,9 +50,10 @@ public class CreateGroups extends JFrame {
 
         panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout());
+        campoNombreGrupo = new JTextField(15);
 
         camposUsuarios = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             camposUsuarios.add(new JTextField(15));
         }
 
@@ -72,8 +76,14 @@ public class CreateGroups extends JFrame {
         panelBotones.add(btnAgregarUsuario);
         panelBotones.add(btnCrearGrupo);
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
-
         add(panelPrincipal);
+        
+        JPanel panelNombreGrupo = new JPanel();
+        panelNombreGrupo.setLayout(new FlowLayout());
+        panelNombreGrupo.add(new JLabel("Nombre del grupo:"));
+        panelNombreGrupo.add(campoNombreGrupo);
+        
+        panelPrincipal.add(panelNombreGrupo, BorderLayout.NORTH);
     }
 
     private void setupListeners() {
@@ -91,14 +101,14 @@ public class CreateGroups extends JFrame {
         btnCrearGrupo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (camposUsuarios.size() < 3) {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 3 nombres de usuario");
+                if (camposUsuarios.size() < 2) {
+                    JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 2 nombres de usuario");
                     return;
                 }
                 
                 for (JTextField campo : camposUsuarios) {
                     if (campo.getText().isEmpty()) {
-                        JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 3 nombres de usuario");
+                        JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 2 nombres de usuario");
                         return;
                     }
                 }
@@ -136,13 +146,16 @@ public class CreateGroups extends JFrame {
                     JOptionPane.showMessageDialog(CreateGroups.this, "No puedes enviarte una solicitud a ti mismo");
                     return;
                 }
-
-                int groupId = obtenerMaxGroupId();
+                
+                int groupId = InsertarGrupoId();
 
                 boolean solicitudEnviada = enviarSolicitudGrupo(groupId, idsUsuarios);
 
                 if (solicitudEnviada) {
                     JOptionPane.showMessageDialog(CreateGroups.this, "Solicitud de grupo enviada correctamente");
+                    dispose();
+                    ListaGrupos listasGrupos = new ListaGrupos(userId);
+                    listasGrupos.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(CreateGroups.this, "Error al enviar la solicitud de grupo");
                 }
@@ -159,16 +172,17 @@ public class CreateGroups extends JFrame {
         return usuarioRecibeId;
     }
 
-    private int obtenerMaxGroupId() {
+    private int InsertarGrupoId() {
+        Nombre = campoNombreGrupo.getText();
         RequestsController requestController = new RequestsController();
-        int groupId = requestController.obtenerMaxGroupId();
+        int groupId = requestController.InsertarGrupo(userId, Nombre);
         return groupId;
     }
 
     private boolean enviarSolicitudGrupo(int groupId, ArrayList<Integer> idsUsuarios) {
-        for(var usuarios : idsUsuarios){
+        for(var usuario : idsUsuarios){
             RequestsController requestController = new RequestsController();
-            boolean res =requestController.enviarSolicitudGrupos(groupId, userId, usuarios);
+            boolean res =requestController.enviarSolicitudGrupos(groupId, usuario, 1);
             if(res == false){
                 System.out.println("no se enviaron las solicitudes");
                 return false;

@@ -8,15 +8,12 @@ import Controllers.RequestsController;
 import Controllers.UsuarioController;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -26,6 +23,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -33,6 +32,9 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  */
 public class FriendsRequests extends JFrame {
     private int userId;
+    private JButton aceptarAmigoButton;
+    private JButton rechazarAmigoButton;
+    private int invitacionIdSeleccionada = -1;
 
     public FriendsRequests(int userId) {
         this.userId = userId;
@@ -67,9 +69,6 @@ public class FriendsRequests extends JFrame {
         JPanel amigosButtonPanel = new JPanel();
         amigosPanel.add(amigosButtonPanel, BorderLayout.SOUTH);
 
-        // Mapa para vincular las solicitudes con sus botones correspondientes
-        Map<Integer, JButton[]> buttonMap = new HashMap<>();
-
         // Agregar el panel de amigos al layout
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -91,33 +90,55 @@ public class FriendsRequests extends JFrame {
                 UsuarioController usuarioController = new UsuarioController();
                 String username = usuarioController.RetornarUsername(usuarioEnviaId);
                 amigosListModel.addElement("Solicitud de amigo de Usuario: " + username);
-                JButton aceptarAmigoButton = new JButton("Aceptar");
-                JButton rechazarAmigoButton = new JButton("Rechazar");
-                amigosButtonPanel.add(aceptarAmigoButton);
-                amigosButtonPanel.add(rechazarAmigoButton);
-
-                // Agregar los botones al mapa
-                buttonMap.put(invitacionId, new JButton[]{aceptarAmigoButton, rechazarAmigoButton});
-
-                aceptarAmigoButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        System.out.println("Se aceptó la solicitud de amigo con Invitacion ID: " + invitacionId);
-                        requestsController.AceptarSolicitudAmigos(usuarioEnviaId, userId);
-                        requestsController.EliminarSolicitudAmigos(invitacionId);
-                    }
-                });
-                rechazarAmigoButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        System.out.println("Se rechazó la solicitud de amigo con Invitacion ID: " + invitacionId);
-                        requestsController.EliminarSolicitudAmigos(invitacionId);
-                    }
-                });
             }
         } else {
             amigosListModel.addElement("No hay solicitudes de amigos.");
         }
+
+        // Botones de aceptar y rechazar
+        aceptarAmigoButton = new JButton("Aceptar");
+        rechazarAmigoButton = new JButton("Rechazar");
+
+        // Agregar los botones al panel de botones
+        amigosButtonPanel.add(aceptarAmigoButton);
+        amigosButtonPanel.add(rechazarAmigoButton);
+
+        // Añadir listener para la selección en la lista de amigos
+        amigosList.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent evt) {
+                // Obtener la invitación seleccionada
+                invitacionIdSeleccionada = solicitudesAmigos.get(amigosList.getSelectedIndex() + 1);
+            }
+        });
+
+        // Añadir listener para el botón de aceptar
+        aceptarAmigoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (invitacionIdSeleccionada != -1) {
+                    System.out.println("Se aceptó la solicitud de amigo con Invitacion ID: " + invitacionIdSeleccionada);
+                    requestsController.AceptarSolicitudAmigos(invitacionIdSeleccionada);
+                    requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
+                    dispose();
+                    RequestsMenu view = new RequestsMenu(userId);
+                    view.setVisible(true);
+                }
+            }
+        });
+
+        // Añadir listener para el botón de rechazar
+        rechazarAmigoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (invitacionIdSeleccionada != -1) {
+                    System.out.println("Se rechazó la solicitud de amigo con Invitacion ID: " + invitacionIdSeleccionada);
+                    requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
+                    dispose();
+                    RequestsMenu view = new RequestsMenu(userId);
+                    view.setVisible(true);
+                }
+            }
+        });
 
         // Empaquetar y mostrar la ventana
         pack();
