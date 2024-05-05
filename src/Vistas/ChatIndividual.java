@@ -2,6 +2,7 @@ package Vistas;
 
 
 import Controllers.ChatsController;
+import Controllers.MessagesController;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.awt.event.WindowListener;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,6 +28,7 @@ public class ChatIndividual extends JFrame {
     
     private JTextArea chatArea;
     private JTextField messageField;
+    MessagesController messagesController = new MessagesController();
     ChatsController chatsController = new ChatsController();
     
     public ChatIndividual(int userId, int chatterSeleccionadoId, String chatterSeleccionadoNombre)
@@ -93,7 +96,24 @@ public class ChatIndividual extends JFrame {
         if (!message.isEmpty()) {
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
-            chatsController.SendMessageToBD(message,userId,chatterId);
+            int chatId = chatsController.GetChatId(userId, chatterId);
+            if (chatId == -1)
+            {
+                boolean registroExitoso = chatsController.CreateChat(userId, chatterId);
+                
+                if (registroExitoso) {
+                    // Mostrar mensaje de éxito
+                    JOptionPane.showMessageDialog(ChatIndividual.this, "¡Usuario registrado correctamente!");
+                    // Cerrar la ventana
+                    dispose();
+                } else {
+                    // Mostrar mensaje de error
+                    JOptionPane.showMessageDialog(ChatIndividual.this, "Error al registrar usuario. Por favor, inténtelo de nuevo.");
+                }
+            }
+            chatId = chatsController.GetChatId(userId, chatterId);
+            
+            messagesController.SendMessageToBD(message, chatId, 1);
         }
     }
 

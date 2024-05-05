@@ -58,6 +58,9 @@ public class UsuarioController {
         } catch (SQLException ex) {
             Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
             return false; 
+        } finally
+        {
+            bd.closeConnection();
         }
     }
     public ArrayList<Usuarios> usuariosPorConexion(int conexion, int usuarioId)
