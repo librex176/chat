@@ -59,4 +59,25 @@ public class MessagesController extends BD {
         }
         return mensajesChat;
     }
+    
+    public boolean DeleteMessagesFromChat(int chatId)
+    {
+        BD bd = new BD();
+        PreparedStatement sql;
+        try {
+            sql = bd.getCon().prepareStatement("DELETE FROM mensajes WHERE chat_id = ?");
+            sql.setInt(1, chatId);
+            int comprobar = sql.executeUpdate();
+            
+            bd.closeConnection();
+           
+            return comprobar > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            return false; 
+        } finally
+        {
+            bd.closeConnection();
+        }
+    }
 }

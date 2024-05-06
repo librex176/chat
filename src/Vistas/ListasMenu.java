@@ -1,15 +1,20 @@
 
 package Vistas;
 
+import Controllers.AmigosController;
+import Controllers.ChatsController;
+import Controllers.MessagesController;
 import Controllers.UsuarioController;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import models.IndividualChatModel;
 
 public class ListasMenu extends JFrame{
     JButton amigos, conectados, grupos, verSolicitudes, cerrarSesion;
@@ -118,7 +123,27 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 UsuarioController usuarioController = new UsuarioController();
+                ChatsController chatsController = new ChatsController();
+                AmigosController amigosController = new AmigosController();
+                MessagesController messagesController = new MessagesController();
                 boolean cerradoExitosamente = usuarioController.cerrarSesion(userId); 
+                
+                // delete all user chats with non-friends
+                List<IndividualChatModel> chatsWithUser = chatsController.SearchChats(userId);
+                if(chatsWithUser != null && !chatsWithUser.isEmpty())
+                {
+                    // for every chat where the leaving user is involved
+                    for(IndividualChatModel chat : chatsWithUser)
+                    {
+                        // checks if the users involved in chat are friends
+                        if(!amigosController.SearchFriends(chat.getChatterId1(), chat.getChatterId2()))
+                        {
+                            // deletes all messages from the chat if users arent friends
+                            messagesController.DeleteMessagesFromChat(chat.getChatId());
+                        }
+                    }
+                }
+                
                 if (cerradoExitosamente) {
                     IniciarSesion gui = new IniciarSesion();
                     gui.setVisible(true);

@@ -5,8 +5,11 @@ import bd.BD;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import models.IndividualChatModel;
 
 public class ChatsController {
     
@@ -55,5 +58,35 @@ public class ChatsController {
         {
             bd.closeConnection();
         }
+    }
+    
+    public List<IndividualChatModel> SearchChats(int chatterId)
+    {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        
+        List<IndividualChatModel> chatsEncontrados = new ArrayList<>();
+        IndividualChatModel chat;
+        
+        try {
+            sql = bd.getCon().prepareStatement("SELECT ConversacionId, Usuario1Id, Usuario2Id FROM chats WHERE (Usuario1Id = ?) OR (Usuario2Id= ?)");
+            sql.setInt(1, chatterId);
+            sql.setInt(2, chatterId);
+            res = sql.executeQuery();
+            
+            while (res.next()) {
+                chat = new IndividualChatModel();
+                chat.setChatId(res.getInt("ConversacionId"));
+                chat.setChatterId1(res.getInt("Usuario1Id"));
+                chat.setChatterId2(res.getInt("Usuario2Id"));
+                chatsEncontrados.add(chat);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            bd.closeConnection();
+        }
+        return chatsEncontrados;
     }
 }

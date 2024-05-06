@@ -94,4 +94,32 @@ public class AmigosController extends BD{
         }
         return null;
     }
+    
+    public boolean SearchFriends(int usuarioId1, int usuarioId2)
+    {
+        BD bd = new BD();
+        PreparedStatement sql;
+        ResultSet res;
+        
+        try
+        {
+            sql = bd.getCon().prepareStatement("SELECT amigosId FROM listaamigos WHERE UsuarioDuenoId =? AND UsuarioId = ?");
+            sql.setInt(1, usuarioId1);
+            sql.setInt(2, usuarioId2);
+            res = sql.executeQuery();
+            
+            if(res.next())
+            {
+                bd.closeConnection();
+                return true;
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally
+        {
+            bd.closeConnection();
+        }
+        return false;
+    }
 }
