@@ -9,16 +9,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import models.Message;
 
 public class ChatIndividual extends JFrame {
     
@@ -52,8 +53,26 @@ public class ChatIndividual extends JFrame {
         panel.setLayout(layout);
         
         chatArea = new JTextArea(20, 30);
+        
         // Deshabilita que el area de chat se pueda editar por el usuario
         chatArea.setEditable(false); 
+        int chatId = chatsController.GetChatId(userId, chatterId);
+        if(chatId != -1)
+        {
+            List<Message> mensajesEnviados = messagesController.GetMessages(chatId);
+            for(Message mensaje : mensajesEnviados)
+            {
+                if(mensaje.getUserId() == userId)
+                {
+                    chatArea.append("You: " + mensaje.getMessageContent() + "\n");
+                }
+                else
+                {
+                    chatArea.append(chatterName + ": " + mensaje.getMessageContent() + "\n");
+                }
+            }
+        }
+        
         JScrollPane scrollPane = new JScrollPane(chatArea);
         messageField = new JTextField(20);
         JButton sendButton = new JButton("Send");
@@ -77,7 +96,7 @@ public class ChatIndividual extends JFrame {
                     .addComponent(messageField)
                     .addComponent(sendButton)
                 )
-        );
+        );  
         
         getContentPane().add(panel);
         pack();
@@ -110,7 +129,7 @@ public class ChatIndividual extends JFrame {
                 chatId = chatsController.GetChatId(userId, chatterId);
             }            
             
-            messagesController.SendMessageToBD(message, chatId);
+            messagesController.SendMessageToBD(message, chatId, userId);
         }
     }
 
