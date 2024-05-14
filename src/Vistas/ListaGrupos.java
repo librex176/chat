@@ -67,22 +67,14 @@ public class ListaGrupos extends JFrame {
         // creando array list con los usernames
         GruposController gruposController = new GruposController(ip);
         String nombre = gruposController.selectNameByUserId(userId);//
-        System.out.println("nombre : "+nombre);
-        ArrayList<Grupos> grupos = gruposController.selectMisGrupos(userId);
-        // Crear un modelo de lista y agregar los datos
-        DefaultListModel<String> modeloLista = new DefaultListModel<>();
-        for (Grupos g : grupos) {
-            System.out.println("g:" + g.nombre);
-            modeloLista.addElement(g.nombre);
-        }
-        // Crear el JList con el modelo de lista
-        JList<String> listaGrupos = new JList<>(modeloLista);
+        System.out.println("nombre : "+ nombre);
+        
 
         // Crear un contenedor para el JList
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(new JScrollPane(listaGrupos), BorderLayout.CENTER);
-
+        
+        
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(a, 20, 100, 300)
@@ -98,24 +90,38 @@ public class ListaGrupos extends JFrame {
                 .addComponent(enviarSolicitud)
         );
         
-        // eventos
-        // seleccionar nombre en la lista
-        // Agregar un ListSelectionListener para detectar la selección de elementos
-        listaGrupos.addListSelectionListener((ListSelectionEvent e) -> {
-            if (!e.getValueIsAdjusting()) { // Asegura que solo se maneje un solo evento de selección
-                // Obtener el índice seleccionado
-                int index = listaGrupos.getSelectedIndex();
-                if (index != -1) { // Asegura que se haya seleccionado un elemento
-                    // Obtener el nombre seleccionado
-                    int grupoId = grupos.get(index).grupoId;
-                    System.out.println("el grupoId es: "+ grupoId);
-                    ChatGrupal chat = new ChatGrupal(userId, grupoId, ip);
-                    chat.setVisible(true);
-                    dispose();
-                }
-            }
-        });
+        ArrayList<Grupos> grupos = gruposController.selectMisGrupos(userId);
+        // Crear un modelo de lista y agregar los datos
         
+        if(grupos!=null)
+        {
+            DefaultListModel<String> modeloLista = new DefaultListModel<>();
+            for (Grupos g : grupos) {
+                System.out.println("g:" + g.nombre);
+                modeloLista.addElement(g.nombre);
+            }
+            // Crear el JList con el modelo de lista
+            JList<String> listaGrupos = new JList<>(modeloLista);
+            panel.add(new JScrollPane(listaGrupos), BorderLayout.CENTER);
+
+            // eventos
+            // seleccionar nombre en la lista
+            // Agregar un ListSelectionListener para detectar la selección de elementos
+            listaGrupos.addListSelectionListener((ListSelectionEvent e) -> {
+                if (!e.getValueIsAdjusting()) { // Asegura que solo se maneje un solo evento de selección
+                    // Obtener el índice seleccionado
+                    int index = listaGrupos.getSelectedIndex();
+                    if (index != -1) { // Asegura que se haya seleccionado un elemento
+                        // Obtener el nombre seleccionado
+                        int grupoId = grupos.get(index).grupoId;
+                        System.out.println("el grupoId es: "+ grupoId);
+                        ChatGrupal chat = new ChatGrupal(userId, grupoId, ip);
+                        chat.setVisible(true);
+                        dispose();
+                    }
+                }
+            });
+        }
         
         enviarSolicitud.addActionListener(new ActionListener() {
             @Override

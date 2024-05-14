@@ -77,16 +77,20 @@ public class GruposController extends BD{
             ArrayList<Grupos> grupos = new ArrayList<>();
             String resultado;
             resultado = in.readLine();
-            String[] gruposStr = resultado.split(";");
-            for(String grupoStr: gruposStr)
+            if(resultado!=null)
             {
-                Grupos grupo = new Grupos();
-                String[] grupoInfoStr = grupoStr.split(":");
-                grupo.nombre = grupoInfoStr[0];
-                grupo.grupoId = Integer.parseInt(grupoInfoStr[1]);
-                grupos.add(grupo);
+                String[] gruposStr = resultado.split(";");
+                for(String grupoStr: gruposStr)
+                {
+                    Grupos grupo = new Grupos();
+                    String[] grupoInfoStr = grupoStr.split(":");
+                    grupo.nombre = grupoInfoStr[0];
+                    grupo.grupoId = Integer.parseInt(grupoInfoStr[1]);
+                    grupos.add(grupo);
+                }
+                return grupos;
             }
-            return grupos;
+            
         } catch (IOException e) {
             System.out.println("error:"+ e.getMessage());
         }
