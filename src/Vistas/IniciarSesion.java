@@ -103,11 +103,11 @@ public class IniciarSesion extends JFrame {
 
             
             UsuarioController usuarioController = new UsuarioController();
-            boolean credencialesValidas = usuarioController.verificarCredenciales(nombreUsuario, contraseña);
-            int usuarioId = usuarioController.RetornarId(nombreUsuario, contraseña);
+            int usuarioId = Integer.parseInt(usuarioController.verificarCredenciales(nombreUsuario, contraseña));
+            //int usuarioId = usuarioController.RetornarId(nombreUsuario, contraseña);
 
             // Verificar si las credenciales son validas
-            if (credencialesValidas) {
+            if (usuarioId != 0) {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
                 usuarioController.ChangeStatus(usuarioId, true);

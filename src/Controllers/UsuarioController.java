@@ -1,9 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Controllers;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,57 +10,121 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Usuarios;
 import bd.BD;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 
-/**
- *
- * @author david
- */
 public class UsuarioController {
+    
     //Validar inicio de sesion
-    public boolean verificarCredenciales(String nombreUsuario, String contraseña) {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
+    public String verificarCredenciales(String nombreUsuario, String contraseña) {
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("SELECT * FROM usuarios WHERE NombreUsuario = ? AND Pass = ?");
-            sql.setString(1, nombreUsuario);
-            sql.setString(2, contraseña);
-            res = sql.executeQuery();
+            socket = new Socket("192.168.0.167", 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "1:" + nombreUsuario + ":" + contraseña;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = "0";
+            resultado = in.readLine();
+            
+            System.out.println(resultado);
+            
+            // manejar la salida entregada por el server por parte de la bd
             
             
-            return res.next();
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-            return false; 
-        } finally {
+            return resultado; // retornar de acuerdo a la consulta al servidor
             
-            bd.closeConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return "0";
+        
+        //////////////////////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        ResultSet res;
+//        try {
+//            sql = bd.getCon().prepareStatement("SELECT * FROM usuarios WHERE NombreUsuario = ? AND Pass = ?");
+//            sql.setString(1, nombreUsuario);
+//            sql.setString(2, contraseña);
+//            res = sql.exe  cuteQuery();
+//            
+//            
+//            return res.next();
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+//            return false; 
+//        } finally {
+//            
+//            bd.closeConnection();
+//        }
     }
+    
     //Insertar un usuario
     public boolean insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita) {
-        BD bd = new BD();
-        PreparedStatement sql;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("INSERT INTO usuarios (NombreUsuario, Pass, RespuestaPreguntaConfianza, StatusConexion) VALUES (?, ?, ?, ?)");
-            sql.setString(1, nombreUsuario);
-            sql.setString(2, contraseña);
-            sql.setString(3, cancionFavorita);
-            sql.setString(4, "0");
-            int comprobar = sql.executeUpdate();
+            socket = new Socket("192.168.137.211", 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            bd.closeConnection();
-           
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-            return false; 
-        } finally
-        {
-            bd.closeConnection();
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "2:" + nombreUsuario + ":" + contraseña + ":" + cancionFavorita;
+            out.writeBytes(sql);
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            
+            // manejar la salida entregada por el server por parte de la bd
+            return resultado.equals("1"); // retornar de acuerdo a la consulta al servidor
+            
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        try {
+//            sql = bd.getCon().prepareStatement("INSERT INTO usuarios (NombreUsuario, Pass, RespuestaPreguntaConfianza, StatusConexion) VALUES (?, ?, ?, ?)");
+//            sql.setString(1, nombreUsuario);
+//            sql.setString(2, contraseña);
+//            sql.setString(3, cancionFavorita);
+//            sql.setString(4, "0");
+//            int comprobar = sql.executeUpdate();
+//            
+//            bd.closeConnection();
+//           
+//            return comprobar > 0;
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+//            return false; 
+//        } finally
+//        {
+//            bd.closeConnection();
+//        }
     }
+    
     public ArrayList<Usuarios> usuariosPorConexion(int conexion, int usuarioId)
     {
         BD bd = new BD();
@@ -169,7 +231,7 @@ public class UsuarioController {
             else
             {
                 sql.setInt(1, 0);
-            }
+            }   
             
             sql.setInt(2, UserId);
             int comprobar = sql.executeUpdate();
