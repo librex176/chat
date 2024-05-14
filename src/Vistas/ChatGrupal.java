@@ -202,7 +202,7 @@ public class ChatGrupal extends JFrame{
             @Override
             public void windowClosing(WindowEvent e) {
                 // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
-                ListaConectados listasConectados = new ListaConectados(userId);
+                ListaConectados listasConectados = new ListaConectados(userId, ip);
                 listasConectados.setVisible(true);
             }
         };

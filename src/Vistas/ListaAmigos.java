@@ -22,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.Timer;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -29,9 +30,9 @@ import javax.swing.event.ListSelectionListener;
 public class ListaAmigos extends JFrame {
     JLabel a;
     JButton enviarSolicitud;
-    JButton btnActualizar; // Nuevo botón para actualizar la lista
     int userId;
     String ip;
+    Timer timer;
     DefaultListModel<String> modeloLista; // Declaración de modeloLista fuera del método init()
     ArrayList<String[]> amigosServer; // Declaración de amigosServer
 
@@ -41,6 +42,7 @@ public class ListaAmigos extends JFrame {
         this.ip = ip;
         init();
         addWindowListener();
+        iniciarTimer();
     }
 
     private void init() {
@@ -63,17 +65,6 @@ public class ListaAmigos extends JFrame {
         a.setFont(font);
         enviarSolicitud = new JButton("Enviar Solicitud");
 
-        // Crear el botón "Actualizar"
-        btnActualizar = new JButton("Actualizar");
-
-        // Agregar un ActionListener al botón "Actualizar"
-        btnActualizar.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Llamar al método para actualizar la lista de amigos
-                actualizarListaAmigos();
-            }
-        });
 
         // Crear un contenedor para el JList
         JPanel panel = new JPanel();
@@ -86,7 +77,7 @@ public class ListaAmigos extends JFrame {
                 .addComponent(panel)
                 .addGroup(layout.createSequentialGroup()
                     .addComponent(enviarSolicitud, 20, 200, 400)
-                    .addComponent(btnActualizar, 20, 200, 400))
+                )
         );
 
         // Configurar el diseño vertical
@@ -96,7 +87,7 @@ public class ListaAmigos extends JFrame {
                 .addComponent(panel)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(enviarSolicitud)
-                    .addComponent(btnActualizar))
+                )
         );
 
         // Crear un modelo de lista vacío
@@ -116,7 +107,7 @@ public class ListaAmigos extends JFrame {
                 if (!e.getValueIsAdjusting()) {
                     int index = listaAmigos.getSelectedIndex();
                     if (index != -1) {
-                        String nombreSeleccionado = modeloLista.getElementAt(index);
+                        String nombreSeleccionado = amigosServer.get(index)[1];
                         int userFriendId = Integer.parseInt(amigosServer.get(index)[0]);
                         int amigosId = Integer.parseInt(amigosServer.get(index)[2]);
                         System.out.println("entra en value changed ");
@@ -135,7 +126,7 @@ public class ListaAmigos extends JFrame {
                         // Según la opción seleccionada por el usuario
                         if (opcion == JOptionPane.YES_OPTION) {
                             // Iniciar el chat
-                            ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado);
+                            ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado, ip);
                             chat.setVisible(true);
                             dispose();
                         } else if (opcion == JOptionPane.NO_OPTION) {
@@ -190,10 +181,18 @@ public class ListaAmigos extends JFrame {
        // String nombre = amigosController.selectNameByUserId(userId);
        // System.out.println("nombre : " + nombre);
         amigosServer = amigosController.selectMisAmigosByUserIdServer(userId, ip); // No necesitas crear una nueva lista aquí
+     
+        modeloLista.clear(); 
         if (amigosServer != null) {
-            modeloLista.clear();
             for (String[] a : amigosServer) {
-                modeloLista.addElement(a[1]);
+                System.out.println("conexion: "+a[3]);
+                if(a[3].contains("0"))
+                {
+                    modeloLista.addElement(a[1]+" (desconectado)");
+                }
+                else{
+                    modeloLista.addElement(a[1]+" (conectado)");
+                }
             }
         }
     }
@@ -204,17 +203,32 @@ public class ListaAmigos extends JFrame {
         boolean res = amigosController.deleteAmigoServer(amigosId, ip);
         if(res == true){System.out.println("amistad eliminada!");}
         else{System.out.println("No se pudo eliminar la amistad!");}
-        actualizarListaAmigos();
+       // actualizarListaAmigos();
     }
 
     private void addWindowListener() {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                timer.stop();
                 ListasMenu listasMenu = new ListasMenu(userId);
                 listasMenu.setVisible(true);
             }
         };
         this.addWindowListener(windowListener);
     }
+    
+    private void iniciarTimer() {
+        // Crear el timer que se ejecutará cada 4 segundos
+        timer = new Timer(3000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Llamar al método para actualizar la lista de conectados
+                actualizarListaAmigos();
+                }
+        });
+        // Iniciar el timer
+        timer.start();
+    }
+
 }
