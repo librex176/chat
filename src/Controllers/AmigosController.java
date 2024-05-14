@@ -47,13 +47,13 @@ public class AmigosController extends BD{
     }
     
     // intento del server con selectMisamigosUsuarios
-    public ArrayList<String[]> selectMisAmigosByUserIdServer(int userId) {
+    public ArrayList<String[]> selectMisAmigosByUserIdServer(int userId, String ip) {
         // conexion al server, el server se encargara de realizar la consulta a la bd
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -88,13 +88,13 @@ public class AmigosController extends BD{
     }
             
     // intento del server con delete amistad
-    public boolean deleteAmigoServer(int amigosId) {
+    public boolean deleteAmigoServer(int amigosId, String ip) {
         // conexion al server, el server se encargara de realizar la consulta a la bd
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             

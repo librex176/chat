@@ -31,12 +31,14 @@ public class ListaAmigos extends JFrame {
     JButton enviarSolicitud;
     JButton btnActualizar; // Nuevo botón para actualizar la lista
     int userId;
+    String ip;
     DefaultListModel<String> modeloLista; // Declaración de modeloLista fuera del método init()
     ArrayList<String[]> amigosServer; // Declaración de amigosServer
 
-    public ListaAmigos(int userId) {
+    public ListaAmigos(int userId, String ip) {
         super();
         this.userId = userId;
+        this.ip = ip;
         init();
         addWindowListener();
     }
@@ -169,7 +171,7 @@ public class ListaAmigos extends JFrame {
         enviarSolicitud.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SendRequestForm sendRequestForm = new SendRequestForm(userId);
+                SendRequestForm sendRequestForm = new SendRequestForm(userId, ip);
                 sendRequestForm.setVisible(true);
                 dispose();
             }
@@ -187,8 +189,8 @@ public class ListaAmigos extends JFrame {
         AmigosController amigosController = new AmigosController();
        // String nombre = amigosController.selectNameByUserId(userId);
        // System.out.println("nombre : " + nombre);
-        amigosServer = amigosController.selectMisAmigosByUserIdServer(userId); // No necesitas crear una nueva lista aquí
-        if (!amigosServer.isEmpty()) {
+        amigosServer = amigosController.selectMisAmigosByUserIdServer(userId, ip); // No necesitas crear una nueva lista aquí
+        if (amigosServer != null) {
             modeloLista.clear();
             for (String[] a : amigosServer) {
                 modeloLista.addElement(a[1]);
@@ -199,7 +201,7 @@ public class ListaAmigos extends JFrame {
         
         System.out.println("Amigo eliminado, el amigos Id es:  " + amigosId);
         AmigosController amigosController = new AmigosController();
-        boolean res = amigosController.deleteAmigoServer(amigosId);
+        boolean res = amigosController.deleteAmigoServer(amigosId, ip);
         if(res == true){System.out.println("amistad eliminada!");}
         else{System.out.println("No se pudo eliminar la amistad!");}
         actualizarListaAmigos();
