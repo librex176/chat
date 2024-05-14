@@ -5,6 +5,11 @@
 package Controllers;
 
 import bd.BD;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,6 +19,14 @@ import java.util.logging.Logger;
 
 // del 46 al 60 en queries
 public class RequestsController extends BD{
+    String ip;
+
+    public RequestsController() {
+    }
+
+    public RequestsController(String ip) {
+        this.ip = ip;
+    }
     //Insertar un usuario
     public boolean enviarSolicitudAmigos(int UsuarioEnviaId, int UsuarioRecibeId) {
         BD bd = new BD();
@@ -96,29 +109,40 @@ public class RequestsController extends BD{
     }
 
     public ArrayList<String> obtenerSolicitudesGrupos(int UsuarioRecibeId) {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         ArrayList<String> solicitudes = new ArrayList<>();
         try {
-            var sql = getCon().prepareStatement("SELECT ig.InvitacionId, g.Nombre, g.UsuarioDuenoId FROM invitacionesgrupos ig INNER JOIN grupos g ON ig.GrupoId = g.GrupoId WHERE ig.UsuarioRecibeId = ? AND Status = ?");
-            sql.setInt(1, UsuarioRecibeId);
-            sql.setInt(2, 1);
-            var rs = sql.executeQuery();
-            while (rs.next()) {
-                var invitacionId = rs.getInt("InvitacionId");
-                var nombreGrupo = rs.getString("Nombre");
-                var usuarioDuenoId = rs.getInt("UsuarioDuenoId");
-                solicitudes.add(String.valueOf(invitacionId));
-                solicitudes.add(nombreGrupo);
-                solicitudes.add(String.valueOf(usuarioDuenoId));
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            String sql;
+            sql = "46:" + UsuarioRecibeId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+           
+            String resultado;
+            resultado = in.readLine();
+            String[] invitacionesStr = resultado.split(";");
+            for(String invitacion: invitacionesStr)
+            {
+                String[] invitacionInfo = invitacion.split(":");
+                if(invitacionInfo.length>0)
+                {
+                    solicitudes.add(invitacionInfo[0]); // invitacionId
+                    solicitudes.add(invitacionInfo[1]); // nombre 
+                    solicitudes.add(invitacionInfo[2]); //usuarioDueñoId
+                }
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            // closeConnection();
+        } catch (IOException e) {
+            System.out.println("Error obteniendo solicitudes de grupos: " + e.getMessage());
         }
         return solicitudes;
     }
 
-    
+
     public boolean AceptarSolicitudAmigos(int InvitacionId) {
         try {
             String query = "INSERT INTO listaamigos (UsuarioDuenoId, UsuarioId) " +
