@@ -12,10 +12,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Samantha
- */
+// del 46 al 60 en queries
 public class RequestsController extends BD{
     //Insertar un usuario
     public boolean enviarSolicitudAmigos(int UsuarioEnviaId, int UsuarioRecibeId) {

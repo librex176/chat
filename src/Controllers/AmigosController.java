@@ -13,10 +13,7 @@ import java.util.logging.Logger;
 import models.Amigos;
 import bd.BD;
 
-/**
- *
- * @author Valeria
- */
+// del 1 al 15 en queries
 public class AmigosController extends BD{
         
     public String selectNameByUserId(int usuarioId)

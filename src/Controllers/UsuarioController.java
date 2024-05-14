@@ -26,7 +26,7 @@ public class UsuarioController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.0.167", 1234); // Usa la IP de tu servidor
+            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -81,7 +81,7 @@ public class UsuarioController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.137.211", 1234); // Usa la IP de tu servidor
+            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             

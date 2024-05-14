@@ -38,7 +38,7 @@ public class ChatIndividual extends JFrame {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.writeBytes(String.valueOf(userId) + "\n"); // Enviar el ID al servidor
         } catch (IOException e) {
-            e.printStackTrace();
+            
         }
 
         init();
@@ -87,11 +87,8 @@ public class ChatIndividual extends JFrame {
         setLocationRelativeTo(null); // centrar la ventana en la pantalla
 
         // listeners
-        sendButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-            }
+        sendButton.addActionListener((ActionEvent e) -> {
+            sendMessage();
         });
     }
 
@@ -101,11 +98,6 @@ public class ChatIndividual extends JFrame {
         if (!message.isEmpty()) {
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
-            try {
-                out.writeBytes(chatterId + ":" + message + "\n"); // Enviar el mensaje al servidor
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             int chatId = chatsController.GetChatId(userId, chatterId);
             if (chatId == -1) {
@@ -116,28 +108,42 @@ public class ChatIndividual extends JFrame {
                 chatId = chatsController.GetChatId(userId, chatterId);
             }
 
-            messagesController.SendMessageToBD(message, chatId, userId);
+            messagesController.SendMessageToServer(message, chatId, userId);
         }
     }
 
     private void startMessageListener() {
         listenerThread = new Thread(() -> {
-            String message;
-            try {
-                while ((message = in.readLine()) != null) {
-                    String[] parts = message.split(":", 2);
-                    String flag = parts[0];
-                    String msgContent = parts[1];
-                    if (Integer.parseInt(flag) == 1) {
-                        chatArea.append("You: " + message + "\n");
-                    }
-                    else{
-                        chatArea.append(message + "\n");
-                    }
+            while(true)
+            {
+                // wait 5 seconds between each loop
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    System.out.println(e);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+                
+                // get messages from server
+                
+                // update chat area
+                chatArea.removeAll();
             }
+//            String message;
+//            try {
+//                while ((message = in.readLine()) != null) {
+//                    String[] parts = message.split(":", 2);
+//                    String flag = parts[0];
+//                    String msgContent = parts[1];
+//                    if (Integer.parseInt(flag) == 1) {
+//                        chatArea.append("You: " + msgContent + "\n");
+//                    }
+//                    else{
+//                        chatArea.append(msgContent + "\n");
+//                    }
+//                }
+//            } catch (IOException e) {
+//                
+//            }
         });
         listenerThread.start();
     }
@@ -153,7 +159,7 @@ public class ChatIndividual extends JFrame {
                         socket.close(); // Cerrar el socket al cerrar la ventana
                     }
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    
                 }
             }
         };

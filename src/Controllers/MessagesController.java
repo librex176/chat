@@ -2,6 +2,11 @@
 package Controllers;
 
 import bd.BD;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,27 +16,59 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Message;
 
+// del 31 al 45 en queries
 public class MessagesController extends BD {
     
-    public boolean SendMessageToBD(String Message, int chatId, int userId){
-        BD bd = new BD();
-        PreparedStatement sql;
+    public boolean SendMessageToServer(String Message, int chatId, int userId){
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("INSERT INTO mensajes (contenido, fecha, chat_id, UsuarioId) VALUES (?, (SELECT CURRENT_TIMESTAMP), ?, ?)");
-            sql.setString(1, Message);
-            sql.setInt(2, chatId);
-            sql.setInt(3, userId);
-            int comprobar = sql.executeUpdate();
-            bd.closeConnection();
-           
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-            return false; 
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "31:" + Message + ":" + chatId + ":" + userId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = "0";
+            resultado = in.readLine();
+            
+            System.out.println(resultado);
+            
+            // manejar la salida entregada por el server por parte de la bd
+            return resultado.equals("true");
+            
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return false;
+        //////////////////////////////////////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        try {
+//            sql = bd.getCon().prepareStatement("INSERT INTO mensajes (contenido, fecha, chat_id, UsuarioId) VALUES (?, (SELECT CURRENT_TIMESTAMP), ?, ?)");
+//            sql.setString(1, Message);
+//            sql.setInt(2, chatId);
+//            sql.setInt(3, userId);
+//            int comprobar = sql.executeUpdate();
+//            bd.closeConnection();
+//           
+//            return comprobar > 0;
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+//            return false; 
+//        } finally
+//        {
+//            bd.closeConnection();
+//        }
     }
     
     public List<Message> GetMessages(int chatId)

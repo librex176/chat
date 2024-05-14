@@ -3,8 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Chat/chat/src/Controllers/UsuarioController.java</file>
-            <file>file:/D:/Chat/chat/src/Vistas/IniciarSesion.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Controllers/MessagesController.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Controllers/ChatsController.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ChatIndividual.java</file>
         </group>
     </open-files>
 </project-private>
