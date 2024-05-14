@@ -12,6 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Amigos;
 import bd.BD;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.util.List;
 
 // del 1 al 15 en queries
 public class AmigosController extends BD{
@@ -39,57 +45,80 @@ public class AmigosController extends BD{
         }
         return null;
     }
-    public ArrayList<Amigos> selectMisAmigosUsuarios(int usuarioId)
-    {
-        PreparedStatement sql;
-        ArrayList<Amigos> amigos;
-        ResultSet r;
-        try
-        {
-            sql = getCon().prepareStatement("SELECT u.NombreUsuario, a.UsuarioId FROM usuarios u INNER JOIN listaamigos a ON u.UsuarioId=a.UsuarioId WHERE a.UsuarioDuenoId=?");
+    
+    // intento del server con selectMisamigosUsuarios
+    public ArrayList<String[]> selectMisAmigosByUserIdServer(int userId) {
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            sql.setInt(1,usuarioId);
-            amigos = new ArrayList<Amigos>();
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                Amigos x = new Amigos();
-                x.nombreUsuario = r.getString("NombreUsuario");
-                x.usuarioId = r.getInt("UsuarioId");
-                amigos.add(x);
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "2:" + userId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            System.out.println("resultado en un mismo string: "+resultado);
+            if(!resultado.equals("0")){
+                String[] parts = resultado.split("_");
+                ArrayList<String[]> amigos = new ArrayList<>();
+                for(String p : parts)
+                {
+                    String[] ob = p.split(":");
+                    amigos.add(ob);
+                }
+                if(!amigos.isEmpty()){
+                    return amigos;
+                }
             }
-            
-            amigos = selectMisAmigosDuenos(amigos, usuarioId);
-            
-            return amigos;
-        } catch (SQLException ex) {
-            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return null;
+        return null; 
     }
-    public ArrayList<Amigos> selectMisAmigosDuenos(ArrayList<Amigos> amigos, int usuarioId)
-    {
-        PreparedStatement sql;
-        ResultSet r;
-        try
-        {
-            sql = getCon().prepareStatement("SELECT u.NombreUsuario, a.UsuarioDuenoId FROM usuarios u INNER JOIN listaamigos a ON u.UsuarioId=a.UsuarioDuenoId WHERE a.UsuarioId=?");
             
-            sql.setInt(1,usuarioId);
-            r = sql.executeQuery();
-            while(r.next())
+    // intento del server con delete amistad
+    public boolean deleteAmigoServer(int amigosId) {
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "3:" + amigosId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            System.out.println("resultado en un mismo string: "+resultado);
+            if(resultado.contains("1"))
             {
-                Amigos x = new Amigos();
-                x.nombreUsuario = r.getString("NombreUsuario");
-                x.usuarioId = r.getInt("UsuarioDuenoId");
-                amigos.add(x);
+                return true;
             }
             
-            return amigos;
-        } catch (SQLException ex) {
-            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return null;
+        return false; 
     }
     
     public boolean SearchFriends(int usuarioId1, int usuarioId2)

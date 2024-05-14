@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Vistas;
-
 import Controllers.AmigosController;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -26,134 +25,194 @@ import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import models.Amigos;
 
-/**
- *
- * @author Valeria
- */
-public class ListaAmigos extends JFrame{
+public class ListaAmigos extends JFrame {
     JLabel a;
     JButton enviarSolicitud;
+    JButton btnActualizar; // Nuevo botón para actualizar la lista
     int userId;
-    
+    DefaultListModel<String> modeloLista; // Declaración de modeloLista fuera del método init()
+    ArrayList<String[]> amigosServer; // Declaración de amigosServer
+
     public ListaAmigos(int userId) {
         super();
         this.userId = userId;
         init();
         addWindowListener();
     }
-    
+
     private void init() {
         setTitle("Lista de mis amigos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.LIGHT_GRAY);
-        
-        // crear groupLayout
+
+        // Crear groupLayout
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        
-        // establecer el auto ajuste de gaps
+
+        // Establecer el auto ajuste de gaps
         layout.setAutoCreateContainerGaps(true);
         layout.setAutoCreateGaps(true);
-        
-    // inicializar elementos
-        // label de amigos
+
+        // Inicializar elementos
+        // Label de amigos
         a = new JLabel("Mis Amigos");
         Font font = new Font("Arial", Font.BOLD, 30);
         a.setFont(font);
         enviarSolicitud = new JButton("Enviar Solicitud");
-        
-        
-        // creando array list con los usernames
-        
-        AmigosController amigosController = new AmigosController();
-        String nombre = amigosController.selectNameByUserId(userId);
-        System.out.println("nombre : "+nombre);
-        ArrayList<Amigos> amigos = amigosController.selectMisAmigosUsuarios(userId);
-        
-        // Crear un modelo de lista y agregar los datos
-        DefaultListModel<String> modeloLista = new DefaultListModel<>();
-        for (Amigos a : amigos) {
-            modeloLista.addElement(a.nombreUsuario);
-        }
 
-        // Crear el JList con el modelo de lista
-        JList<String> listaAmigos = new JList<>(modeloLista);
+        // Crear el botón "Actualizar"
+        btnActualizar = new JButton("Actualizar");
+
+        // Agregar un ActionListener al botón "Actualizar"
+        btnActualizar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Llamar al método para actualizar la lista de amigos
+                actualizarListaAmigos();
+            }
+        });
 
         // Crear un contenedor para el JList
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        panel.add(new JScrollPane(listaAmigos), BorderLayout.CENTER);
 
-        
-        // configurar el diseño horizontal
+        // Configurar el diseño horizontal
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(a, 20, 100, 300)
                 .addComponent(panel)
-                .addComponent(enviarSolicitud, 20, 200, 400)
+                .addGroup(layout.createSequentialGroup()
+                    .addComponent(enviarSolicitud, 20, 200, 400)
+                    .addComponent(btnActualizar, 20, 200, 400))
         );
-        
-        // configurar el diseño vertical
+
+        // Configurar el diseño vertical
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addComponent(a)
                 .addComponent(panel)
-                .addComponent(enviarSolicitud)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(enviarSolicitud)
+                    .addComponent(btnActualizar))
         );
-        
-        
-     
-        // eventos
-        // seleccionar nombre en la lista
-        // Agregar un ListSelectionListener para detectar la selección de elementos
+
+        // Crear un modelo de lista vacío
+        modeloLista = new DefaultListModel<>();
+
+        // Crear el JList con el modelo de lista
+        JList<String> listaAmigos = new JList<>(modeloLista);
+
+        // Agregar el JList a un JScrollPane y luego al panel
+        panel.add(new JScrollPane(listaAmigos), BorderLayout.CENTER);
+
+        // Eventos
+        // Seleccionar nombre en la lista
         listaAmigos.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) { // Asegura que solo se maneje un solo evento de selección
-                    // Obtener el índice seleccionado
+                if (!e.getValueIsAdjusting()) {
                     int index = listaAmigos.getSelectedIndex();
-                    if (index != -1) { // Asegura que se haya seleccionado un elemento
-                        // Obtener el nombre seleccionado
+                    if (index != -1) {
                         String nombreSeleccionado = modeloLista.getElementAt(index);
-                        int userFriendId = amigos.get(index).usuarioId;
-                        
-                        ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado);
-                        chat.setVisible(true);
-                        dispose();
+                        int userFriendId = Integer.parseInt(amigosServer.get(index)[0]);
+                        int amigosId = Integer.parseInt(amigosServer.get(index)[2]);
+                        System.out.println("entra en value changed ");
+                        System.out.println("userFriendId: " + userFriendId);
+                        System.out.println("nombre seleccionado: " + nombreSeleccionado);
+                        // Mostrar un JOptionPane para preguntar al usuario si quiere ir al chat o eliminar al amigo
+                        int opcion = JOptionPane.showOptionDialog(ListaAmigos.this,
+                                "¿Qué desea hacer con " + nombreSeleccionado + "?",
+                                "Acciones disponibles",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE,
+                                null,
+                                new String[]{"Ir al chat", "Eliminar"},
+                                "Ir al chat");
+
+                        // Según la opción seleccionada por el usuario
+                        if (opcion == JOptionPane.YES_OPTION) {
+                            // Iniciar el chat
+                            ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado);
+                            chat.setVisible(true);
+                            dispose();
+                        } else if (opcion == JOptionPane.NO_OPTION) {
+                            // Eliminar al amigo
+                                // Crear un JPanel de confirmación
+                            JPanel panelConfirmacion = new JPanel();
+                            panelConfirmacion.add(new JLabel("¿Seguro que desea eliminar a "+nombreSeleccionado+" como amigo?"));
+
+                            // Mostrar un JOptionPane con el panel de confirmación
+                            int opcionEliminar = JOptionPane.showOptionDialog(ListaAmigos.this,
+                                    panelConfirmacion,
+                                    "Confirmar eliminación",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE,
+                                    null,
+                                    new String[]{"Eliminar", "Cancelar"},
+                                    "Eliminar");
+
+                            // Según la opción seleccionada por el usuario
+                            if (opcionEliminar == JOptionPane.YES_OPTION) {
+                                eliminarAmigo(amigosId);
+                            } else if (opcionEliminar == JOptionPane.NO_OPTION || opcionEliminar == JOptionPane.CLOSED_OPTION) {
+                                // El usuario canceló la operación de eliminación
+                                System.out.println("Eliminación cancelada");
+                            }
+                        }
                     }
                 }
             }
         });
-        
+
+        // Redirigir a SendRequestForm y pasar userId
         enviarSolicitud.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Redirigir a SendRequestForm y pasar userId
-                SendRequestForm SendRequestForm = new SendRequestForm(userId);
-                SendRequestForm.setVisible(true);
+                SendRequestForm sendRequestForm = new SendRequestForm(userId);
+                sendRequestForm.setVisible(true);
                 dispose();
             }
         });
-        
-        // empaquetar y mostrar la ventana
-        pack(); // ajustar el tamaño de la ventana según el contenido
-        setLocationRelativeTo(null); // centrar la ventana en la pantalla
+
+        // Empaquetar y mostrar la ventana
+        pack();
+        setLocationRelativeTo(null);
+
+        // Llamar al método para actualizar la lista de amigos al inicio
+        actualizarListaAmigos();
     }
+
+    private void actualizarListaAmigos() {
+        AmigosController amigosController = new AmigosController();
+       // String nombre = amigosController.selectNameByUserId(userId);
+       // System.out.println("nombre : " + nombre);
+        amigosServer = amigosController.selectMisAmigosByUserIdServer(userId); // No necesitas crear una nueva lista aquí
+        if (!amigosServer.isEmpty()) {
+            modeloLista.clear();
+            for (String[] a : amigosServer) {
+                modeloLista.addElement(a[1]);
+            }
+        }
+    }
+    private void eliminarAmigo(int amigosId) {
         
-     
+        System.out.println("Amigo eliminado, el amigos Id es:  " + amigosId);
+        AmigosController amigosController = new AmigosController();
+        boolean res = amigosController.deleteAmigoServer(amigosId);
+        if(res == true){System.out.println("amistad eliminada!");}
+        else{System.out.println("No se pudo eliminar la amistad!");}
+        actualizarListaAmigos();
+    }
+
     private void addWindowListener() {
-        // Crear una instancia del WindowListener
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
                 ListasMenu listasMenu = new ListasMenu(userId);
                 listasMenu.setVisible(true);
             }
         };
-
         this.addWindowListener(windowListener);
     }
 }
