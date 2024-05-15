@@ -20,7 +20,7 @@ public class IniciarSesion extends JFrame {
     private JLabel etiqueta1 = new JLabel("Usuario:");
     private JLabel etiqueta2 = new JLabel("Contraseña");
     
-    public String IP = "192.168.100.76";
+    public String IP = "192.168.100.203";
 
     
     public IniciarSesion() {
@@ -103,7 +103,7 @@ public class IniciarSesion extends JFrame {
             String contraseña = textField2.getText();
 
             
-            UsuarioController usuarioController = new UsuarioController();
+            UsuarioController usuarioController = new UsuarioController(IP);
             int usuarioId = Integer.parseInt(usuarioController.verificarCredenciales(nombreUsuario, contraseña, IP));
             //int usuarioId = usuarioController.RetornarId(nombreUsuario, contraseña);
 

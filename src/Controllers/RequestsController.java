@@ -10,100 +10,138 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // del 46 al 60 en queries
 public class RequestsController extends BD{
     String ip;
-
-    public RequestsController() {
-    }
 
     public RequestsController(String ip) {
         this.ip = ip;
     }
     //Insertar un usuario
     public boolean enviarSolicitudAmigos(int UsuarioEnviaId, int UsuarioRecibeId) {
-        BD bd = new BD();
-        PreparedStatement sql;
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("INSERT INTO invitacionesamigos (UsuarioEnviaId, UsuarioRecibeId) VALUES (?, ?)");
-            sql.setInt(1, UsuarioEnviaId);
-            sql.setInt(2, UsuarioRecibeId);
-            int comprobar = sql.executeUpdate();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            bd.closeConnection();
-           
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-            return false; 
-        }
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "52:" + UsuarioEnviaId + ":" + UsuarioRecibeId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            System.out.println(resultado + " de solicitud de amistad");
+            
+            return resultado.equals("true"); // retornar de acuerdo a la consulta al servidor
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;  
+        }       
     }
     
-    public int InsertarGrupo(int UsuarioDuenoId, String Nombre) {
+    public int InsertarGrupo(int UsuarioDuenoId, String Nombre){
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            var sql = getCon().prepareStatement("INSERT INTO grupos (UsuarioDuenoId, Nombre) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-            sql.setInt(1, UsuarioDuenoId);
-            sql.setString(2, Nombre);
-            int affectedRows = sql.executeUpdate();
-
-            if (affectedRows == 0) {
-                throw new SQLException("No se pudo insertar el grupo.");
-            }
-
-            try (var generatedKeys = sql.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
-                } else {
-                    throw new SQLException("No se pudo obtener el GrupoId generado.");
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "53:" + UsuarioDuenoId + ":" + Nombre ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+          
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            int id = Integer.parseInt(resultado);
+            //System.out.println(resultado);
+            
+            return id;
+        } catch (IOException e) {
+            e.printStackTrace();
             return -1; // Devuelve un valor que indique error
         }
     }
     
     public boolean enviarSolicitudGrupos(int GrupoId,int UsuarioRecibeId, int Status) {
-        BD bd = new BD();
-        PreparedStatement sql;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("INSERT INTO invitacionesgrupos (GrupoId, UsuarioRecibeId, Status) VALUES (?, ?, ?)");
-            sql.setInt(1, GrupoId);
-            sql.setInt(2, UsuarioRecibeId);
-            sql.setInt(3, Status);
-            int comprobar = sql.executeUpdate();
-                      
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "54:" + GrupoId + ":" + UsuarioRecibeId + ":" + Status;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            
+            return resultado.equals("true");
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return false; 
         }
     }
        
-    public ArrayList<Integer> obtenerSolicitudesAmigos(int userId) {
+    public ArrayList<Integer> obtenerSolicitudesAmigos(int UsuarioRecibeId) {
         ArrayList<Integer> solicitudes = new ArrayList<>();
-        PreparedStatement sql;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = getCon().prepareStatement("SELECT UsuarioEnviaId, InvitacionId FROM invitacionesamigos WHERE UsuarioRecibeId = ?");
-            sql.setInt(1, userId);
-            var rs = sql.executeQuery();
-            while (rs.next()) {
-                int usuarioEnviaId = rs.getInt("UsuarioEnviaId");
-                int invitacionId = rs.getInt("InvitacionId");
-                solicitudes.add(usuarioEnviaId);
-                solicitudes.add(invitacionId);
-            }
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            obtenerSolicitudesGrupos(userId);
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "55:" + UsuarioRecibeId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            String resultado;
+            resultado = in.readLine();
+            if(resultado != null){
+                String[] solicitudesstr = resultado.split(";");
+                for(String req: solicitudesstr)
+                {
+                    String[] invitacionInfo = req.split(":");
+                    if(invitacionInfo.length > 0)
+                    {
+                        solicitudes.add(Integer.parseInt(invitacionInfo[0])); // UsuarioEnviaId
+                        solicitudes.add(Integer.parseInt(invitacionInfo[1])); // InvitacionId 
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
         return solicitudes;
     }
@@ -125,15 +163,17 @@ public class RequestsController extends BD{
            
             String resultado;
             resultado = in.readLine();
-            String[] invitacionesStr = resultado.split(";");
-            for(String invitacion: invitacionesStr)
-            {
-                String[] invitacionInfo = invitacion.split(":");
-                if(invitacionInfo.length>0)
+            if(resultado != null){
+                String[] invitacionesStr = resultado.split(";");
+                for(String invitacion: invitacionesStr)
                 {
-                    solicitudes.add(invitacionInfo[0]); // invitacionId
-                    solicitudes.add(invitacionInfo[1]); // nombre 
-                    solicitudes.add(invitacionInfo[2]); //usuarioDueñoId
+                    String[] invitacionInfo = invitacion.split(":");
+                    if(invitacionInfo.length>0)
+                    {
+                        solicitudes.add(invitacionInfo[0]); // invitacionId
+                        solicitudes.add(invitacionInfo[1]); // nombre 
+                        solicitudes.add(invitacionInfo[2]); //usuarioDueñoId
+                    }
                 }
             }
         } catch (IOException e) {
@@ -142,48 +182,86 @@ public class RequestsController extends BD{
         return solicitudes;
     }
 
-
     public boolean AceptarSolicitudAmigos(int InvitacionId) {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            String query = "INSERT INTO listaamigos (UsuarioDuenoId, UsuarioId) " +
-                            "SELECT ia.UsuarioEnviaId, ia.UsuarioRecibeId " +
-                            "FROM invitacionesamigos ia " +
-                            "WHERE ia.InvitacionId = ?";
-            PreparedStatement sql = getCon().prepareStatement(query);
-            sql.setInt(1, InvitacionId);
-            int comprobar = sql.executeUpdate();
-
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "57:" + InvitacionId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            
+            return resultado.equals("true");
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return false;
         }
     }
 
     public boolean EliminarSolicitudAmigos(int InvitacionId) {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            PreparedStatement sql = getCon().prepareStatement("DELETE FROM invitacionesamigos WHERE InvitacionId = ?");
-            sql.setInt(1, InvitacionId);
-            int comprobar = sql.executeUpdate();
-            //closeConnection();
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "58:" + InvitacionId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            
+            return resultado.equals("true");
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return false;
         }
     }
     
     public boolean actualizarEstadoSolicitudGrupo(int invitacionId, int Status) {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            String query = "UPDATE invitacionesgrupos SET Status = ? WHERE InvitacionId = ?";
-            PreparedStatement sql = getCon().prepareStatement(query);
-            sql.setInt(1, Status);
-            sql.setInt(2, invitacionId);
-            int comprobar = sql.executeUpdate();
-
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "59:" + Status + ":" + invitacionId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            
+            return resultado.equals("true");
+        } catch (IOException ex) {
+            ex.printStackTrace();
             return false;
         }
     }

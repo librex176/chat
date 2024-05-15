@@ -71,18 +71,17 @@ public class SendRequestForm extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String nombreUsuario = entrada.getText();
-                UsuarioController usuarioController = new UsuarioController();
+                UsuarioController usuarioController = new UsuarioController(ip);
                 int usuarioRecibeId = usuarioController.EncontrarUsuarios(nombreUsuario);
                 
                 if (usuarioRecibeId != -1) {
-                    //No se puede enviar a si mismo
                     int idUsuarioActual = userId;
                     if (usuarioRecibeId == idUsuarioActual) {
                         JOptionPane.showMessageDialog(SendRequestForm.this, "No puedes enviarte una solicitud a ti mismo");
                         return;
                     }
                     // Usuario encontrado, enviar solicitud de amistad
-                    RequestsController requestController = new RequestsController();
+                    RequestsController requestController = new RequestsController(ip);
                     requestController.enviarSolicitudAmigos(userId, usuarioRecibeId);
                     JOptionPane.showMessageDialog(SendRequestForm.this, "Solicitud enviada a " + nombreUsuario);
                     dispose();
@@ -98,7 +97,7 @@ public class SendRequestForm extends JFrame{
         setLocationRelativeTo(null);
     }
 
-     private void addWindowListener() {
+    private void addWindowListener() {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

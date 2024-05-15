@@ -18,6 +18,11 @@ import java.net.Socket;
 
 
 public class UsuarioController {
+    String ip;
+
+    public UsuarioController(String ip) {
+        this.ip = ip;
+    }
     
     //Validar inicio de sesion
     public String verificarCredenciales(String nombreUsuario, String contraseña, String ip) {
@@ -215,45 +220,31 @@ public class UsuarioController {
     }
     
     public int EncontrarUsuarios(String nombreUsuario) {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
-        int userId = -1; // Valor predeterminado si las credenciales son incorrectas
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("SELECT UsuarioId FROM usuarios WHERE NombreUsuario = ?");
-            sql.setString(1, nombreUsuario);
-            res = sql.executeQuery();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            if (res.next()) {
-                userId = res.getInt("UsuarioId");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            bd.closeConnection();
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "75:" + nombreUsuario;
+            out.writeBytes(sql + "\n");
+            out.flush();
+          
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            int id = Integer.parseInt(resultado);
+            System.out.println(id);
+            return id;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return -1; // Devuelve un valor que indique error
         }
-        return userId;
-    }
-    
-    public String RetornarUsername(int UsuarioId) {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
-        String NombreUsuario = "";
-        try {
-            sql = bd.getCon().prepareStatement("SELECT NombreUsuario FROM usuarios WHERE UsuarioId = ?");
-            sql.setInt(1, UsuarioId);
-            res = sql.executeQuery();
-            
-            if (res.next()) {
-                NombreUsuario = res.getString("NombreUsuario");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            bd.closeConnection();
-        }
-        return NombreUsuario;
     }
     
     public boolean ChangeStatus(int UserId, boolean status)
