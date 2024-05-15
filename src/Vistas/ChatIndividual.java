@@ -7,8 +7,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import models.Message;
 
 public class ChatIndividual extends JFrame {
 
@@ -118,32 +120,34 @@ public class ChatIndividual extends JFrame {
             {
                 // wait 5 seconds between each loop
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     System.out.println(e);
                 }
                 
-                // get messages from server
+                // get messages from server with query (getMessages)
+                int chatId = chatsController.GetChatId(userId, chatterId);
+                List<Message> mensajesChat;
+                mensajesChat = messagesController.GetMessages(chatId);
+                
                 
                 // update chat area
-                chatArea.removeAll();
+                
+                for(Message message : mensajesChat)
+                {
+                    int senderId = message.getUserId();
+                    String messageContent = message.getMessageContent();
+                    
+                    if(senderId == userId)
+                    {
+                        chatArea.append("You: " + messageContent + "\n");
+                    }
+                    else
+                    {
+                        chatArea.append(messageContent + "\n");
+                    }
+                }
             }
-//            String message;
-//            try {
-//                while ((message = in.readLine()) != null) {
-//                    String[] parts = message.split(":", 2);
-//                    String flag = parts[0];
-//                    String msgContent = parts[1];
-//                    if (Integer.parseInt(flag) == 1) {
-//                        chatArea.append("You: " + msgContent + "\n");
-//                    }
-//                    else{
-//                        chatArea.append(msgContent + "\n");
-//                    }
-//                }
-//            } catch (IOException e) {
-//                
-//            }
         });
         listenerThread.start();
     }

@@ -42,8 +42,6 @@ public class ChatsController {
             String resultado = "0";
             resultado = in.readLine();
             
-            System.out.println(resultado);
-            
             // manejar la salida entregada por el server por parte de la bd
             return Integer.parseInt(resultado);
             
@@ -96,8 +94,6 @@ public class ChatsController {
             // recibir el resultado de la consulta del server
             String resultado = "0";
             resultado = in.readLine();
-            
-            System.out.println(resultado);
             
             // manejar la salida entregada por el server por parte de la bd
             return resultado.equals("true");
