@@ -126,17 +126,17 @@ public class ListasMenu extends JFrame{
                 boolean cerradoExitosamente = usuarioController.cerrarSesion(userId); 
                 
                 // delete all user chats with non-friends
-                List<IndividualChatModel> chatsWithUser = chatsController.SearchChats(userId);
+                List<IndividualChatModel> chatsWithUser = chatsController.SearchChats(userId, ip);
                 if(chatsWithUser != null && !chatsWithUser.isEmpty())
                 {
                     // for every chat where the leaving user is involved
                     for(IndividualChatModel chat : chatsWithUser)
                     {
                         // checks if the users involved in chat are friends
-                        if(!amigosController.SearchFriends(chat.getChatterId1(), chat.getChatterId2()))
+                        if(!amigosController.SearchFriends(chat.getChatterId1(), chat.getChatterId2(), ip))
                         {
                             // deletes all messages from the chat if users arent friends
-                            messagesController.DeleteMessagesFromChat(chat.getChatId());
+                            messagesController.DeleteMessagesFromChat(chat.getChatId(), ip);
                         }
                     }
                 }
