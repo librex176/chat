@@ -21,6 +21,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
@@ -87,14 +88,13 @@ public class GroupRequests extends JFrame {
                 String Nombre = solicitudesGrupos.get(i + 1);
                 String UsuarioDueno = solicitudesGrupos.get(i + 2);
                 int dueno = Integer.parseInt(UsuarioDueno);
-                UsuarioController usuarioController = new UsuarioController();
-                String username = usuarioController.RetornarUsername(dueno);
+                GruposController gruposController = new GruposController(ip);
+                String username = gruposController.selectNameByUserId(dueno);
                 gruposListModel.addElement("Solicitud de grupo: " + Nombre + " Creada por: " + username);
                 JButton aceptarGrupoButton = new JButton("Aceptar");
                 JButton rechazarGrupoButton = new JButton("Rechazar");
                 gruposButtonPanel.add(aceptarGrupoButton);
                 gruposButtonPanel.add(rechazarGrupoButton);
-                GruposController gruposController = new GruposController(ip);
 
                 aceptarGrupoButton.addActionListener((ActionEvent e) -> {
                     // Obtener el índice seleccionado y el nombre del grupo
@@ -137,7 +137,7 @@ public class GroupRequests extends JFrame {
                 });
             }
         } else {
-            gruposListModel.addElement("No hay solicitudes de grupos.");
+             JOptionPane.showMessageDialog(GroupRequests.this, "No tienes solicitudes de grupos");
         }
 
         // Empaquetar y mostrar la ventana

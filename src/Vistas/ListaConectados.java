@@ -68,7 +68,7 @@ public class ListaConectados extends JFrame {
 
 
         // inicializando controller usuarios
-        UsuarioController usuariosController = new UsuarioController();
+        UsuarioController usuariosController = new UsuarioController(ip);
         // creando paneles de lista de conectados
         JPanel panelConectados = new JPanel();
         panelConectados.setLayout(new BorderLayout());
@@ -170,7 +170,7 @@ public class ListaConectados extends JFrame {
     }
 
     private void actualizarListaConectados(DefaultListModel<String> modeloListaConectados) {
-        UsuarioController usuariosController = new UsuarioController();
+        UsuarioController usuariosController = new UsuarioController(ip);
         conectados = usuariosController.usuariosPorConexionServer(1, userId, ip);
         modeloListaConectados.clear();
         if(conectados != null){
@@ -183,7 +183,7 @@ public class ListaConectados extends JFrame {
     }
 
     private void actualizarListaDesconectados(DefaultListModel<String> modeloListaDesconectados) {
-        UsuarioController usuariosController = new UsuarioController();
+        UsuarioController usuariosController = new UsuarioController(ip);
         ArrayList<String[]> desconectados = usuariosController.usuariosPorConexionServer(0, userId, ip);
         modeloListaDesconectados.clear();
         if(desconectados != null){

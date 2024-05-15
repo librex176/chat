@@ -27,8 +27,7 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  */
 public class CreateGroups extends JFrame {
     private JPanel panelPrincipal;
-    private ArrayList<JTextField> camposUsuarios;
-    private JButton btnAgregarUsuario;
+    private JTextField campoUsuarios;
     private JButton btnCrearGrupo;
     private JTextField campoNombreGrupo;
     int userId;
@@ -53,78 +52,50 @@ public class CreateGroups extends JFrame {
         panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout());
         campoNombreGrupo = new JTextField(15);
+        campoUsuarios = new JTextField(30); // El campo de texto es más grande para los nombres de usuario
 
-        camposUsuarios = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            camposUsuarios.add(new JTextField(15));
-        }
-
-        btnAgregarUsuario = new JButton("+");
         btnCrearGrupo = new JButton("Crear Grupo");
     }
 
     private void setupLayout() {
-        JPanel panelUsuarios = new JPanel();
-        panelUsuarios.setLayout(new FlowLayout());
-
-        for (JTextField campoUsuario : camposUsuarios) {
-            panelUsuarios.add(campoUsuario);
-        }
-
-        panelPrincipal.add(new JLabel("Nombres de usuario:"), BorderLayout.NORTH);
-        panelPrincipal.add(panelUsuarios, BorderLayout.CENTER);
-
-        JPanel panelBotones = new JPanel();
-        panelBotones.add(btnAgregarUsuario);
-        panelBotones.add(btnCrearGrupo);
-        panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
-        add(panelPrincipal);
-        
         JPanel panelNombreGrupo = new JPanel();
         panelNombreGrupo.setLayout(new FlowLayout());
         panelNombreGrupo.add(new JLabel("Nombre del grupo:"));
         panelNombreGrupo.add(campoNombreGrupo);
         
         panelPrincipal.add(panelNombreGrupo, BorderLayout.NORTH);
+        
+        panelPrincipal.add(new JLabel("Nombres de usuario (separados por coma):"), BorderLayout.CENTER);
+        panelPrincipal.add(campoUsuarios, BorderLayout.CENTER);
+
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnCrearGrupo);
+        panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
+        add(panelPrincipal);
     }
 
     private void setupListeners() {
-        btnAgregarUsuario.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField nuevoCampo = new JTextField(15);
-                camposUsuarios.add(nuevoCampo);
-                panelPrincipal.add(nuevoCampo, BorderLayout.CENTER);
-                panelPrincipal.revalidate();
-                panelPrincipal.repaint();
-            }
-        });
-
         btnCrearGrupo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (camposUsuarios.size() < 2) {
+                String usuariosInput = campoUsuarios.getText();
+                String[] nombres = usuariosInput.split(",");
+                
+                if (nombres.length < 2) {
                     JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 2 nombres de usuario");
                     return;
                 }
-                
-                for (JTextField campo : camposUsuarios) {
-                    if (campo.getText().isEmpty()) {
-                        JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 2 nombres de usuario");
-                        return;
-                    }
-                }
 
                 // Validar que todos los nombres de usuario sean diferentes
-                ArrayList<String> nombres = new ArrayList<>();
+                ArrayList<String> nombresList = new ArrayList<>();
                 boolean nombresRepetidos = false;
-                for (JTextField campo : camposUsuarios) {
-                    String nombre = campo.getText();
-                    if (nombres.contains(nombre)) {
+                for (String nombre : nombres) {
+                    nombre = nombre.trim(); // Eliminar espacios en blanco al principio y al final
+                    if (nombresList.contains(nombre)) {
                         nombresRepetidos = true;
                         break;
                     }
-                    nombres.add(nombre);
+                    nombresList.add(nombre);
                 }
 
                 if (nombresRepetidos) {
@@ -133,7 +104,7 @@ public class CreateGroups extends JFrame {
                 }
 
                 ArrayList<Integer> idsUsuarios = new ArrayList<>();
-                for (String nombre : nombres) {
+                for (String nombre : nombresList) {
                     int idUsuario = obtenerIdUsuario(nombre);
                     if (idUsuario == -1) {
                         JOptionPane.showMessageDialog(CreateGroups.this, "El usuario '" + nombre + "' no existe");
@@ -169,22 +140,22 @@ public class CreateGroups extends JFrame {
     }
 
     private int obtenerIdUsuario(String nombreUsuario) {
-        UsuarioController usuarioController = new UsuarioController();
+        UsuarioController usuarioController = new UsuarioController(ip);
         int usuarioRecibeId = usuarioController.EncontrarUsuarios(nombreUsuario);
         return usuarioRecibeId;
     }
 
     private int InsertarGrupoId() {
         Nombre = campoNombreGrupo.getText();
-        RequestsController requestController = new RequestsController();
+        RequestsController requestController = new RequestsController(ip);
         int groupId = requestController.InsertarGrupo(userId, Nombre);
         return groupId;
     }
 
     private boolean enviarSolicitudGrupo(int groupId, ArrayList<Integer> idsUsuarios) {
         for(var usuario : idsUsuarios){
-            RequestsController requestController = new RequestsController();
-            boolean res =requestController.enviarSolicitudGrupos(groupId, usuario, 1);
+            RequestsController requestController = new RequestsController(ip);
+            boolean res = requestController.enviarSolicitudGrupos(groupId, usuario, 1);
             if(res == false){
                 System.out.println("no se enviaron las solicitudes");
                 return false;

@@ -98,7 +98,7 @@ public class RegistrarUsuario extends JFrame {
                 String cancionFavorita = respuestaPregunta.getText();
 
                 // Instanciar el controlador de usuarios
-                UsuarioController usuarioController = new UsuarioController();
+                UsuarioController usuarioController = new UsuarioController(ip);
 
                 // Llamar al método para insertar el usuario en la base de datos
                 boolean registroExitoso = usuarioController.insertarUsuario(nombreUsuario, contraseña, cancionFavorita, IP);

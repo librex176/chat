@@ -119,7 +119,7 @@ public class ListasMenu extends JFrame{
         cerrarSesion.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                UsuarioController usuarioController = new UsuarioController();
+                UsuarioController usuarioController = new UsuarioController(ip);
                 ChatsController chatsController = new ChatsController();
                 AmigosController amigosController = new AmigosController();
                 MessagesController messagesController = new MessagesController();

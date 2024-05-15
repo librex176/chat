@@ -4,6 +4,7 @@
  */
 package Vistas;
 
+import Controllers.GruposController;
 import Controllers.RequestsController;
 import Controllers.UsuarioController;
 import java.awt.BorderLayout;
@@ -20,6 +21,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
@@ -47,9 +49,9 @@ public class FriendsRequests extends JFrame {
     }
 
     private void initComponents() {
-        RequestsController requestsController = new RequestsController();
+        RequestsController requestController = new RequestsController(ip);
 
-        ArrayList<Integer> solicitudesAmigos = requestsController.obtenerSolicitudesAmigos(userId);
+        ArrayList<Integer> solicitudesAmigos = requestController.obtenerSolicitudesAmigos(userId);
 
         setTitle("Lista de solicitudes de amigos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -87,16 +89,16 @@ public class FriendsRequests extends JFrame {
         );
 
         // Llenar las listas con las solicitudes de amigos
-        if (solicitudesAmigos != null) {
+        if (solicitudesAmigos != null && !solicitudesAmigos.isEmpty()){
             for (int i = 0; i < solicitudesAmigos.size(); i += 2) {
                 int usuarioEnviaId = solicitudesAmigos.get(i);
                 int invitacionId = solicitudesAmigos.get(i + 1);
-                UsuarioController usuarioController = new UsuarioController();
-                String username = usuarioController.RetornarUsername(usuarioEnviaId);
+                GruposController gruposController = new GruposController(ip);
+                String username = gruposController.selectNameByUserId(usuarioEnviaId);
                 amigosListModel.addElement("Solicitud de amigo de Usuario: " + username);
             }
         } else {
-            amigosListModel.addElement("No hay solicitudes de amigos.");
+            JOptionPane.showMessageDialog(FriendsRequests.this, "No tienes solicitudes");
         }
 
         // Botones de aceptar y rechazar
@@ -121,8 +123,8 @@ public class FriendsRequests extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (invitacionIdSeleccionada != -1) {
                     System.out.println("Se aceptó la solicitud de amigo con Invitacion ID: " + invitacionIdSeleccionada);
-                    requestsController.AceptarSolicitudAmigos(invitacionIdSeleccionada);
-                    requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
+                    requestController.AceptarSolicitudAmigos(invitacionIdSeleccionada);
+                    requestController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
                     dispose();
                     RequestsMenu view = new RequestsMenu(userId, ip);
                     view.setVisible(true);
@@ -136,7 +138,7 @@ public class FriendsRequests extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (invitacionIdSeleccionada != -1) {
                     System.out.println("Se rechazó la solicitud de amigo con Invitacion ID: " + invitacionIdSeleccionada);
-                    requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
+                    requestController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
                     dispose();
                     RequestsMenu view = new RequestsMenu(userId, ip);
                     view.setVisible(true);
