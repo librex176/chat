@@ -123,33 +123,83 @@ public class ChatsController {
 //        }
     }
     
-    public List<IndividualChatModel> SearchChats(int chatterId)
+    public List<IndividualChatModel> SearchChats(int chatterId, String ip)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
-        
-        List<IndividualChatModel> chatsEncontrados = new ArrayList<>();
+        List<IndividualChatModel> chats = new ArrayList<>();
         IndividualChatModel chat;
         
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("SELECT ConversacionId, Usuario1Id, Usuario2Id FROM chats WHERE (Usuario1Id = ?) OR (Usuario2Id= ?)");
-            sql.setInt(1, chatterId);
-            sql.setInt(2, chatterId);
-            res = sql.executeQuery();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            while (res.next()) {
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "18:" + chatterId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = "0";
+            while(true)
+            {
+                resultado = in.readLine();
+                
+                if(resultado == null)
+                {
+                    break;
+                }
+                
+                System.out.println(resultado);
+                String[] parts = resultado.split(":");
+                
                 chat = new IndividualChatModel();
-                chat.setChatId(res.getInt("ConversacionId"));
-                chat.setChatterId1(res.getInt("Usuario1Id"));
-                chat.setChatterId2(res.getInt("Usuario2Id"));
-                chatsEncontrados.add(chat);
+                chat.setChatId(Integer.parseInt(parts[0]));
+                chat.setChatterId1(Integer.parseInt(parts[1]));
+                chat.setChatterId2(Integer.parseInt(parts[2]));
+                System.out.println("Chatter 2 recibido: " + chat.getChatterId2());
+                
+                chats.add(chat);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            bd.closeConnection();
+            
+            // manejar la salida entregada por el server por parte de la bd
+            return chats;
+            
+        } catch (IOException e) {
+            
         }
-        return chatsEncontrados;
+        return chats;
+        ////////////////////////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        ResultSet res;
+//        
+//        List<IndividualChatModel> chatsEncontrados = new ArrayList<>();
+//        IndividualChatModel chat;
+//        
+//        try {
+//            sql = bd.getCon().prepareStatement("SELECT ConversacionId, Usuario1Id, Usuario2Id FROM chats WHERE (Usuario1Id = ?) OR (Usuario2Id= ?)");
+//            sql.setInt(1, chatterId);
+//            sql.setInt(2, chatterId);
+//            res = sql.executeQuery();
+//            
+//            while (res.next()) {
+//                chat = new IndividualChatModel();
+//                chat.setChatId(res.getInt("ConversacionId"));
+//                chat.setChatterId1(res.getInt("Usuario1Id"));
+//                chat.setChatterId2(res.getInt("Usuario2Id"));
+//                chatsEncontrados.add(chat);
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+//        } finally {
+//            bd.closeConnection();
+//        }
+//        return chatsEncontrados;
     }
 }

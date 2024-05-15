@@ -40,9 +40,8 @@ public class ChatIndividual extends JFrame {
             socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // out.writeBytes(String.valueOf(userId) + "\n"); // Enviar el ID al servidor
         } catch (IOException e) {
-            
+            e.printStackTrace();
         }
 
         init();
@@ -91,9 +90,7 @@ public class ChatIndividual extends JFrame {
         setLocationRelativeTo(null); // centrar la ventana en la pantalla
 
         // listeners
-        sendButton.addActionListener((ActionEvent e) -> {
-            sendMessage();
-        });
+        sendButton.addActionListener((ActionEvent e) -> sendMessage());
     }
 
     private void sendMessage() {
@@ -118,38 +115,37 @@ public class ChatIndividual extends JFrame {
 
     private void startMessageListener() {
         listenerThread = new Thread(() -> {
-            while(true)
-            {
-                // wait 5 seconds between each loop
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1500);
+
+                    // clear chat area before updating it
+                    SwingUtilities.invokeLater(() -> {
+                        chatArea.setText("");
+                    });
+
+                    // get messages from server with query (getMessages)
+                    int chatId = chatsController.GetChatId(userId, chatterId, ip);
+                    List<Message> mensajesChat = messagesController.GetMessages(chatId, ip);
+
+                    // update chat area
+                    SwingUtilities.invokeLater(() -> {
+                        for (Message message : mensajesChat) {
+                            int senderId = message.getUserId();
+                            String messageContent = message.getMessageContent();
+
+                            if (senderId == userId) {
+                                chatArea.append("You: " + messageContent + "\n");
+                            } else {
+                                chatArea.append(messageContent + "\n");
+                            }
+                        }
+                    });
                 } catch (InterruptedException e) {
-                    System.out.println(e);
-                }
-                
-                // clear chat area before uodating it
-                chatArea.selectAll();
-                chatArea.replaceSelection(""); 
-                
-                // get messages from server with query (getMessages)
-                int chatId = chatsController.GetChatId(userId, chatterId, ip);
-                List<Message> mensajesChat;
-                mensajesChat = messagesController.GetMessages(chatId, ip);
-                
-                // update chat area
-                for(Message message : mensajesChat)
-                {
-                    int senderId = message.getUserId();
-                    String messageContent = message.getMessageContent();
-                    
-                    if(senderId == userId)
-                    {
-                        chatArea.append("You: " + messageContent + "\n");
-                    }
-                    else
-                    {
-                        chatArea.append(messageContent + "\n");
-                    }
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                    break; // Exit the loop if interrupted
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -160,17 +156,22 @@ public class ChatIndividual extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ListaConectados listasConectados = new ListaConectados(userId, ip); 
+                ListaConectados listasConectados = new ListaConectados(userId, ip);
                 listasConectados.setVisible(true);
-                try {
-                    if (socket != null) {
-                        socket.close(); // Cerrar el socket al cerrar la ventana
-                    }
-                } catch (IOException ex) {
-                    
-                }
+                listenerThread.interrupt();
+                closeResources();
             }
         };
         this.addWindowListener(windowListener);
+    }
+
+    private void closeResources() {
+        try {
+            if (in != null) in.close();
+            if (out != null) out.close();
+            if (socket != null && !socket.isClosed()) socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -132,6 +132,8 @@ public class ListasMenu extends JFrame{
                     // for every chat where the leaving user is involved
                     for(IndividualChatModel chat : chatsWithUser)
                     {
+                        System.out.println("User 1: " + chat.getChatterId1());
+                        System.out.println("User 2: " + chat.getChatterId2());
                         // checks if the users involved in chat are friends
                         if(!amigosController.SearchFriends(chat.getChatterId1(), chat.getChatterId2(), ip))
                         {

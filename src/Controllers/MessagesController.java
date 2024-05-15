@@ -47,7 +47,7 @@ public class MessagesController extends BD {
             return resultado.equals("true");
             
         } catch (IOException e) {
-            e.printStackTrace();
+            
         }
         return false;
         //////////////////////////////////////////////////////////////////////
@@ -97,8 +97,6 @@ public class MessagesController extends BD {
             String resultado;
             while(true)
             {
-                out.writeBytes("Recibido");
-                
                 resultado = in.readLine();
                 
                 if(resultado.equals("Mensajes Terminados"))
@@ -120,7 +118,7 @@ public class MessagesController extends BD {
             return mensajesChat;
             
         } catch (IOException e) {
-            e.printStackTrace();
+            
         }
         return mensajesChat;
         
@@ -149,24 +147,55 @@ public class MessagesController extends BD {
 //        return mensajesChat;
     }
     
-    public boolean DeleteMessagesFromChat(int chatId)
+    public boolean DeleteMessagesFromChat(int chatId, String ip)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("DELETE FROM mensajes WHERE chat_id = ?");
-            sql.setInt(1, chatId);
-            int comprobar = sql.executeUpdate();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            bd.closeConnection();
-           
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
-            return false; 
-        } finally
-        {
-            bd.closeConnection();
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "33:" + chatId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = "0";
+            resultado = in.readLine();
+            
+            System.out.println(resultado);
+            
+            // manejar la salida entregada por el server por parte de la bd
+            return resultado.equals("true");
+            
+        } catch (IOException e) {
+            
         }
+        return false;
+        //////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        try {
+//            sql = bd.getCon().prepareStatement("DELETE FROM mensajes WHERE chat_id = ?");
+//            sql.setInt(1, chatId);
+//            int comprobar = sql.executeUpdate();
+//            
+//            bd.closeConnection();
+//           
+//            return comprobar > 0;
+//        } catch (SQLException ex) {
+//            Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);
+//            return false; 
+//        } finally
+//        {
+//            bd.closeConnection();
+//        }
     }
 }

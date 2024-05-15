@@ -116,36 +116,61 @@ public class AmigosController extends BD{
             
 
         } catch (IOException e) {
-            e.printStackTrace();
         }
         return false; 
     }
     
-    public boolean SearchFriends(int usuarioId1, int usuarioId2)
+    public boolean SearchFriends(int usuarioId1, int usuarioId2, String ip)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
-        
-        try
-        {
-            sql = bd.getCon().prepareStatement("SELECT amigosId FROM listaamigos WHERE UsuarioDuenoId =? AND UsuarioId = ?");
-            sql.setInt(1, usuarioId1);
-            sql.setInt(2, usuarioId2);
-            res = sql.executeQuery();
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            if(res.next())
-            {
-                bd.closeConnection();
-                return true;
-            }
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "5:" + usuarioId1 + ":" + usuarioId2;
+            out.writeBytes(sql + "\n");
+            out.flush();
             
-        } catch (SQLException ex) {
-            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            return (resultado.equals("true"));
+            
+
+        } catch (IOException e) {
         }
         return false;
+        ////////////////////////////////////////////////////////
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        ResultSet res;
+//        
+//        try
+//        {
+//            sql = bd.getCon().prepareStatement("SELECT amigosId FROM listaamigos WHERE UsuarioDuenoId =? AND UsuarioId = ?");
+//            sql.setInt(1, usuarioId1);
+//            sql.setInt(2, usuarioId2);
+//            res = sql.executeQuery();
+//            
+//            if(res.next())
+//            {
+//                bd.closeConnection();
+//                return true;
+//            }
+//            
+//        } catch (SQLException ex) {
+//            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+//        } finally
+//        {
+//            bd.closeConnection();
+//        }
+//        return false;
     }
 }
