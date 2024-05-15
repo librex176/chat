@@ -26,7 +26,7 @@ public class UsuarioController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            socket = new Socket("192.168.100.19", 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -81,7 +81,7 @@ public class UsuarioController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            socket = new Socket("192.168.100.19", 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -125,6 +125,47 @@ public class UsuarioController {
 //        }
     }
     
+    // intentar agarrar lista conectados y desconectados con el server
+    public ArrayList<String[]> usuariosPorConexionServer(int conexion, int userId, String ip) {
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor Axel: 192.168.100.76
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "4:" + userId+":"+conexion;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+           // System.out.println("resultado en un mismo string: "+resultado);
+            if(!resultado.equals("0")){
+                String[] parts = resultado.split("_");
+                ArrayList<String[]> amigos = new ArrayList<>();
+                for(String p : parts)
+                {
+                    String[] ob = p.split(":");
+                    amigos.add(ob);
+                }
+                if(!amigos.isEmpty()){
+                    return amigos;
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null; 
+    }
+    // borrar este
     public ArrayList<Usuarios> usuariosPorConexion(int conexion, int usuarioId)
     {
         BD bd = new BD();

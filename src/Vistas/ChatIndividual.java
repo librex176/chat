@@ -17,6 +17,7 @@ public class ChatIndividual extends JFrame {
     int userId;
     int chatterId;
     String chatterName;
+    String ip;
 
     private JTextArea chatArea;
     private JTextField messageField;
@@ -28,14 +29,15 @@ public class ChatIndividual extends JFrame {
     MessagesController messagesController = new MessagesController();
     ChatsController chatsController = new ChatsController();
 
-    public ChatIndividual(int userId, int chatterSeleccionadoId, String chatterSeleccionadoNombre) {
+    public ChatIndividual(int userId, int chatterSeleccionadoId, String chatterSeleccionadoNombre, String ip) {
         super();
         this.userId = userId;
         this.chatterId = chatterSeleccionadoId;
         this.chatterName = chatterSeleccionadoNombre;
+        this.ip = ip;
 
         try {
-            socket = new Socket("192.168.0.53", 1234); // Usa la IP de tu servidor
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out.writeBytes(String.valueOf(userId) + "\n"); // Enviar el ID al servidor
@@ -101,13 +103,13 @@ public class ChatIndividual extends JFrame {
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
 
-            int chatId = chatsController.GetChatId(userId, chatterId);
+            int chatId = chatsController.GetChatId(userId, chatterId, ip);
             if (chatId == -1) {
-                registroExitoso = chatsController.CreateChat(userId, chatterId);
+                registroExitoso = chatsController.CreateChat(userId, chatterId, ip);
             }
 
             if (registroExitoso) {
-                chatId = chatsController.GetChatId(userId, chatterId);
+                chatId = chatsController.GetChatId(userId, chatterId, ip);
             }
 
             messagesController.SendMessageToServer(message, chatId, userId);
@@ -156,7 +158,7 @@ public class ChatIndividual extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ListaConectados listasConectados = new ListaConectados(userId);
+                ListaConectados listasConectados = new ListaConectados(userId, ip); 
                 listasConectados.setVisible(true);
                 try {
                     if (socket != null) {

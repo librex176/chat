@@ -32,6 +32,7 @@ public class ListasMenu extends JFrame{
     }
     
     private void init() {
+        String ip="192.168.100.19";
         setTitle("Mis listas");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.LIGHT_GRAY);
@@ -81,7 +82,7 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                ListaAmigos listAmigosView = new ListaAmigos(userId);
+                ListaAmigos listAmigosView = new ListaAmigos(userId, ip);
                 listAmigosView.setVisible(true);
                 dispose();
             }
@@ -92,7 +93,7 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                ListaConectados listAmigosView = new ListaConectados(userId);
+                ListaConectados listAmigosView = new ListaConectados(userId, ip);
                 listAmigosView.setVisible(true);
                 dispose();
             }
@@ -103,7 +104,7 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                ListaGrupos listAmigosView = new ListaGrupos(userId);
+                ListaGrupos listAmigosView = new ListaGrupos(userId, ip);
                 listAmigosView.setVisible(true);
                 dispose();
             }

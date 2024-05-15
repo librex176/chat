@@ -32,10 +32,12 @@ public class CreateGroups extends JFrame {
     private JButton btnCrearGrupo;
     private JTextField campoNombreGrupo;
     int userId;
+    String ip;
     String Nombre;
 
-    public CreateGroups(int userId) {
+    public CreateGroups(int userId, String ip) {
         this.userId  = userId;
+        this.ip = ip;
         initComponents();
         setupLayout();
         setupListeners();
@@ -154,7 +156,7 @@ public class CreateGroups extends JFrame {
                 if (solicitudEnviada) {
                     JOptionPane.showMessageDialog(CreateGroups.this, "Solicitud de grupo enviada correctamente");
                     dispose();
-                    ListaGrupos listasGrupos = new ListaGrupos(userId);
+                    ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
                     listasGrupos.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(CreateGroups.this, "Error al enviar la solicitud de grupo");
@@ -195,7 +197,7 @@ public class CreateGroups extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ListaGrupos listasGrupos = new ListaGrupos(userId);
+                ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
                 listasGrupos.setVisible(true);
                 dispose();
             }

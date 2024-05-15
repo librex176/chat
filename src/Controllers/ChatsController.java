@@ -19,14 +19,15 @@ import models.IndividualChatModel;
 // del 16 al 30 en queries
 public class ChatsController {
     
-    public int GetChatId(int chatterId1, int chatterId2)
+    public int GetChatId(int chatterId1, int chatterId2, String ip)
     {
         // conexion al server, el server se encargara de realizar la consulta a la bd
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            System.out.println("ip de chats: "+ip);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -73,13 +74,14 @@ public class ChatsController {
 //        return chatId;
     }
     
-    public boolean CreateChat(int chatterId1, int chatterId2)
+    public boolean CreateChat(int chatterId1, int chatterId2, String ip)
     {
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            System.out.println("ip de chats: "+ip);
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             

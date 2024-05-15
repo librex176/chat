@@ -23,10 +23,12 @@ public class SendRequestForm extends JFrame{
     JTextField entrada;
     JButton enviar;
     int userId;
+    String ip;
  
-    public SendRequestForm(int userId) {
+    public SendRequestForm(int userId, String ip) {
         super();
         this.userId  = userId;
+        this.ip = ip;
         initComponents();
         addWindowListener();
     }
@@ -84,7 +86,7 @@ public class SendRequestForm extends JFrame{
                     requestController.enviarSolicitudAmigos(userId, usuarioRecibeId);
                     JOptionPane.showMessageDialog(SendRequestForm.this, "Solicitud enviada a " + nombreUsuario);
                     dispose();
-                    ListaAmigos listaAmigos = new ListaAmigos(userId);
+                    ListaAmigos listaAmigos = new ListaAmigos(userId, ip);
                     listaAmigos.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(SendRequestForm.this, "El usuario no existe");
@@ -100,7 +102,7 @@ public class SendRequestForm extends JFrame{
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ListaAmigos listaAmigos = new ListaAmigos(userId);
+                ListaAmigos listaAmigos = new ListaAmigos(userId, ip);
                 listaAmigos.setVisible(true);
                 dispose();
             }

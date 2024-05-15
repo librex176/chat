@@ -4,6 +4,7 @@
  */
 package Vistas;
 
+import Controllers.GruposController;
 import Controllers.RequestsController;
 import Controllers.UsuarioController;
 import java.awt.BorderLayout;
@@ -30,15 +31,18 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
  */
 public class GroupRequests extends JFrame {
     private int userId;
+    private String ip;
 
-    public GroupRequests(int userId) {
+    public GroupRequests(int userId, String ip) {
         this.userId = userId;
+        this.ip = ip;
         initComponents();
         addWindowListener();
     }
 
     private void initComponents() {
-        RequestsController requestsController = new RequestsController();
+       
+        RequestsController requestsController = new RequestsController(ip);
 
         ArrayList<String> solicitudesGrupos = requestsController.obtenerSolicitudesGrupos(userId);
 
@@ -89,37 +93,47 @@ public class GroupRequests extends JFrame {
                 JButton rechazarGrupoButton = new JButton("Rechazar");
                 gruposButtonPanel.add(aceptarGrupoButton);
                 gruposButtonPanel.add(rechazarGrupoButton);
+                GruposController gruposController = new GruposController(ip);
 
-                aceptarGrupoButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Obtener el índice seleccionado y el nombre del grupo
-                        int selectedIndex = gruposList.getSelectedIndex();
-                        if (selectedIndex != -1) {
-                            int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
-                            requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);
-                            dispose();
-                            RequestsMenu view = new RequestsMenu(userId);
-                            view.setVisible(true);
-                        }
+                aceptarGrupoButton.addActionListener((ActionEvent e) -> {
+                    // Obtener el índice seleccionado y el nombre del grupo
+                    int selectedIndex = gruposList.getSelectedIndex();
+                    if (selectedIndex != -1) {
+                        int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
+                        requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);//
+                        dispose();
+                        RequestsMenu view = new RequestsMenu(userId);
+                        view.setVisible(true);
                     }
                 });
+                
 
-                rechazarGrupoButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        int selectedIndex = gruposList.getSelectedIndex();
-                        if (selectedIndex != -1) {
-                            int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
-                            requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 3);
-                            dispose();
-                            RequestsMenu view = new RequestsMenu(userId);
-                            view.setVisible(true);
+                rechazarGrupoButton.addActionListener((ActionEvent e) -> {
+                    int selectedIndex = gruposList.getSelectedIndex();
+                    if (selectedIndex != -1) {
+                        int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
+                        int grupoId = gruposController.selectGrupoIdInvitaciones(invitacionId);//
+                        System.out.println("grupoId: "+grupoId);
+                        int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);//
+                        System.out.println("Cant participantes: "+ cantidadParticipantes);
+                        if(cantidadParticipantes<=2)
+                        {
+                            
+                            boolean borradoMensajes = gruposController.deleteMensajesGrupos(grupoId);//
+                            System.out.println("Se borro mensajes: "+borradoMensajes);
+                            boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);//
+                            System.out.println("Borrar invitaciones grupos: " + comprobar);
+                            if(comprobar)
+                            {
+                                boolean verificar = gruposController.deleteGrupo(grupoId);//
+                                System.out.println("Borrar grupos: " + verificar);
+                            }
                         }
+                        dispose();
+                        RequestsMenu view = new RequestsMenu(userId);
+                        view.setVisible(true);
                     }
-});
-
-
+                });
             }
         } else {
             gruposListModel.addElement("No hay solicitudes de grupos.");
