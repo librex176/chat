@@ -19,10 +19,11 @@ public class IniciarSesion extends JFrame {
     private JButton Registrar = new JButton("Registrarme");
     private JLabel etiqueta1 = new JLabel("Usuario:");
     private JLabel etiqueta2 = new JLabel("Contraseña");
+    
+    public String IP = "192.168.100.76";
 
     
     public IniciarSesion() {
-        
         
         super("Iniciar Sesión");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -91,7 +92,7 @@ public class IniciarSesion extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                RegistrarUsuario ventanaRegistrar = new RegistrarUsuario();
+                RegistrarUsuario ventanaRegistrar = new RegistrarUsuario(IP);
                 ventanaRegistrar.setVisible(true);
             }
         });
@@ -103,7 +104,7 @@ public class IniciarSesion extends JFrame {
 
             
             UsuarioController usuarioController = new UsuarioController();
-            int usuarioId = Integer.parseInt(usuarioController.verificarCredenciales(nombreUsuario, contraseña));
+            int usuarioId = Integer.parseInt(usuarioController.verificarCredenciales(nombreUsuario, contraseña, IP));
             //int usuarioId = usuarioController.RetornarId(nombreUsuario, contraseña);
 
             // Verificar si las credenciales son validas
@@ -111,7 +112,7 @@ public class IniciarSesion extends JFrame {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
                 usuarioController.ChangeStatus(usuarioId, true);
-                ListasMenu gui = new ListasMenu(usuarioId);
+                ListasMenu gui = new ListasMenu(usuarioId, IP);
                 gui.setVisible(true);
                 // Hacer invisible esta ventana
                 setVisible(false);

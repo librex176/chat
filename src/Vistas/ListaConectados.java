@@ -14,7 +14,6 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -24,7 +23,6 @@ import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import models.Usuarios;
 import Controllers.UsuarioController;
 import javax.swing.Timer;
 
@@ -149,7 +147,7 @@ public class ListaConectados extends JFrame {
                         // Según la opción seleccionada por el usuario
                         if (opcion == JOptionPane.YES_OPTION) {
                             // Iniciar el chat
-                            ChatIndividual chat = new ChatIndividual(userId, opcion, nombreSeleccionado, ip);
+                            ChatIndividual chat = new ChatIndividual(userId, userConectadoId, nombreSeleccionado, ip);
                             chat.setVisible(true);
                             dispose();
                             
@@ -204,7 +202,7 @@ public class ListaConectados extends JFrame {
             public void windowClosing(WindowEvent e) {
                 timer.stop();
                 // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
-                ListasMenu listasMenu = new ListasMenu(userId);
+                ListasMenu listasMenu = new ListasMenu(userId, ip);
                 listasMenu.setVisible(true);
             }
         };

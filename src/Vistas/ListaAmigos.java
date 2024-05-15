@@ -211,7 +211,7 @@ public class ListaAmigos extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 timer.stop();
-                ListasMenu listasMenu = new ListasMenu(userId);
+                ListasMenu listasMenu = new ListasMenu(userId, ip);
                 listasMenu.setVisible(true);
             }
         };

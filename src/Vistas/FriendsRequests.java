@@ -35,9 +35,13 @@ public class FriendsRequests extends JFrame {
     private JButton aceptarAmigoButton;
     private JButton rechazarAmigoButton;
     private int invitacionIdSeleccionada = -1;
+    
+    String ip;
 
-    public FriendsRequests(int userId) {
+    public FriendsRequests(int userId, String ip) {
+        super();
         this.userId = userId;
+        this.ip = ip;
         initComponents();
         addWindowListener();
     }
@@ -120,7 +124,7 @@ public class FriendsRequests extends JFrame {
                     requestsController.AceptarSolicitudAmigos(invitacionIdSeleccionada);
                     requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
                     dispose();
-                    RequestsMenu view = new RequestsMenu(userId);
+                    RequestsMenu view = new RequestsMenu(userId, ip);
                     view.setVisible(true);
                 }
             }
@@ -134,7 +138,7 @@ public class FriendsRequests extends JFrame {
                     System.out.println("Se rechazó la solicitud de amigo con Invitacion ID: " + invitacionIdSeleccionada);
                     requestsController.EliminarSolicitudAmigos(invitacionIdSeleccionada);
                     dispose();
-                    RequestsMenu view = new RequestsMenu(userId);
+                    RequestsMenu view = new RequestsMenu(userId, ip);
                     view.setVisible(true);
                 }
             }
@@ -151,7 +155,7 @@ public class FriendsRequests extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                RequestsMenu view = new RequestsMenu(userId);
+                RequestsMenu view = new RequestsMenu(userId, ip);
                 view.setVisible(true);
             }
         };

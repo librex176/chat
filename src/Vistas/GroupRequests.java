@@ -34,6 +34,7 @@ public class GroupRequests extends JFrame {
     private String ip;
 
     public GroupRequests(int userId, String ip) {
+        super();
         this.userId = userId;
         this.ip = ip;
         initComponents();
@@ -102,7 +103,7 @@ public class GroupRequests extends JFrame {
                         int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
                         requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);//
                         dispose();
-                        RequestsMenu view = new RequestsMenu(userId);
+                        RequestsMenu view = new RequestsMenu(userId, ip);
                         view.setVisible(true);
                     }
                 });
@@ -130,7 +131,7 @@ public class GroupRequests extends JFrame {
                             }
                         }
                         dispose();
-                        RequestsMenu view = new RequestsMenu(userId);
+                        RequestsMenu view = new RequestsMenu(userId, ip);
                         view.setVisible(true);
                     }
                 });
@@ -151,7 +152,7 @@ public class GroupRequests extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                RequestsMenu view = new RequestsMenu(userId);
+                RequestsMenu view = new RequestsMenu(userId, ip);
                 view.setVisible(true);
             }
         };

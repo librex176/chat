@@ -144,7 +144,7 @@ public class ListaGrupos extends JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
-                ListasMenu listasMenu = new ListasMenu(userId);
+                ListasMenu listasMenu = new ListasMenu(userId, ip);
                 listasMenu.setVisible(true);
             }
         };

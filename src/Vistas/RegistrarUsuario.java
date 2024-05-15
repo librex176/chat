@@ -30,11 +30,14 @@ public class RegistrarUsuario extends JFrame {
     JLabel passLabel = new JLabel("Crear Contraseña:");
     JLabel respuestaPreguntaLabel = new JLabel("¿Cual es tu cancion favorita?:");
     
+    String IP;
+    
     //Funcionalidades de los botonoes
     
-    public RegistrarUsuario(){
+    public RegistrarUsuario(String ip){
         //Parametros de iniucio del formulario
         super("Registrar Usuario");
+        this.IP = ip;
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GroupLayout orden = new GroupLayout(this.getContentPane());
         orden.setAutoCreateContainerGaps(true);
@@ -98,7 +101,7 @@ public class RegistrarUsuario extends JFrame {
                 UsuarioController usuarioController = new UsuarioController();
 
                 // Llamar al método para insertar el usuario en la base de datos
-                boolean registroExitoso = usuarioController.insertarUsuario(nombreUsuario, contraseña, cancionFavorita);
+                boolean registroExitoso = usuarioController.insertarUsuario(nombreUsuario, contraseña, cancionFavorita, IP);
                 
                 // Verificar si el registro fue exitoso
                 if (registroExitoso) {

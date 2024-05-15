@@ -19,20 +19,16 @@ import models.IndividualChatModel;
 public class ListasMenu extends JFrame{
     JButton amigos, conectados, grupos, verSolicitudes, cerrarSesion;
     int userId;
+    String ip;
     
-    public ListasMenu() {
-        super();
-        init();
-    }
-    
-    public ListasMenu(int userId) {
+    public ListasMenu(int userId, String IP) {
         super();
         this.userId  = userId;
+        this.ip = IP;
         init();
     }
     
     private void init() {
-        String ip="192.168.100.19";
         setTitle("Mis listas");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.LIGHT_GRAY);
@@ -114,7 +110,7 @@ public class ListasMenu extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 // mandar el userId que está iniciado sesion
-                RequestsMenu View = new RequestsMenu(userId);
+                RequestsMenu View = new RequestsMenu(userId, ip);
                 View.setVisible(true);
                 dispose();
             }

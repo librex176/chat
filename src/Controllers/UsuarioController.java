@@ -20,13 +20,13 @@ import java.net.Socket;
 public class UsuarioController {
     
     //Validar inicio de sesion
-    public String verificarCredenciales(String nombreUsuario, String contraseña) {
+    public String verificarCredenciales(String nombreUsuario, String contraseña, String ip) {
         // conexion al server, el server se encargara de realizar la consulta a la bd
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.19", 1234); // Usa la IP de tu servidor
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -35,6 +35,7 @@ public class UsuarioController {
             // se envia un string con el numero de la query a ejecutar en el server y los datos 
             // necesarios para la ejecucion de la query
             sql = "1:" + nombreUsuario + ":" + contraseña;
+            System.out.println(sql);
             out.writeBytes(sql + "\n");
             out.flush();
             
@@ -42,11 +43,7 @@ public class UsuarioController {
             String resultado = "0";
             resultado = in.readLine();
             
-            System.out.println(resultado);
-            
             // manejar la salida entregada por el server por parte de la bd
-            
-            
             return resultado; // retornar de acuerdo a la consulta al servidor
             
         } catch (IOException e) {
@@ -76,12 +73,12 @@ public class UsuarioController {
     }
     
     //Insertar un usuario
-    public boolean insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita) {
+    public boolean insertarUsuario(String nombreUsuario, String contraseña, String cancionFavorita, String ip) {
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.19", 1234); // Usa la IP de tu servidor
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             

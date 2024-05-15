@@ -18,16 +18,17 @@ import java.awt.event.WindowListener;
 public class RequestsMenu extends JFrame{
     JButton btnSolicitudesAmigos, btnSolicitudesGrupos;
     int userId;
+    String ip;
     
-    public RequestsMenu(int userId) {
+    public RequestsMenu(int userId, String ip) {
         super();
         this.userId  = userId;
+        this.ip = ip;
         initComponents();
         addWindowListener();
     }
 
     private void initComponents() {
-        String ip = "192.168.100.232";
         setTitle("Lista de solicitudes de amigos");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         getContentPane().setBackground(Color.LIGHT_GRAY);
@@ -58,7 +59,7 @@ public class RequestsMenu extends JFrame{
         btnSolicitudesAmigos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FriendsRequests requestsFriends = new FriendsRequests(userId);
+                FriendsRequests requestsFriends = new FriendsRequests(userId, ip);
                 requestsFriends.setVisible(true);
                 dispose();
             }
@@ -87,7 +88,7 @@ public class RequestsMenu extends JFrame{
             @Override
             public void windowClosing(WindowEvent e) {
                 // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
-                ListasMenu listasMenu = new ListasMenu(userId);
+                ListasMenu listasMenu = new ListasMenu(userId, ip);
                 listasMenu.setVisible(true);
             }
         };

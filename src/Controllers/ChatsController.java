@@ -26,7 +26,6 @@ public class ChatsController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            System.out.println("ip de chats: "+ip);
             socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -80,7 +79,6 @@ public class ChatsController {
         DataOutputStream out;
         BufferedReader in;
         try {
-            System.out.println("ip de chats: "+ip);
             socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));

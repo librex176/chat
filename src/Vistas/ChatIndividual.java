@@ -40,7 +40,7 @@ public class ChatIndividual extends JFrame {
             socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.writeBytes(String.valueOf(userId) + "\n"); // Enviar el ID al servidor
+            // out.writeBytes(String.valueOf(userId) + "\n"); // Enviar el ID al servidor
         } catch (IOException e) {
             
         }
@@ -112,7 +112,7 @@ public class ChatIndividual extends JFrame {
                 chatId = chatsController.GetChatId(userId, chatterId, ip);
             }
 
-            messagesController.SendMessageToServer(message, chatId, userId);
+            messagesController.SendMessageToServer(message, chatId, userId, ip);
         }
     }
 
@@ -122,19 +122,21 @@ public class ChatIndividual extends JFrame {
             {
                 // wait 5 seconds between each loop
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     System.out.println(e);
                 }
                 
-                // get messages from server with query (getMessages)
-                int chatId = chatsController.GetChatId(userId, chatterId);
-                List<Message> mensajesChat;
-                mensajesChat = messagesController.GetMessages(chatId);
+                // clear chat area before uodating it
+                chatArea.selectAll();
+                chatArea.replaceSelection(""); 
                 
+                // get messages from server with query (getMessages)
+                int chatId = chatsController.GetChatId(userId, chatterId, ip);
+                List<Message> mensajesChat;
+                mensajesChat = messagesController.GetMessages(chatId, ip);
                 
                 // update chat area
-                
                 for(Message message : mensajesChat)
                 {
                     int senderId = message.getUserId();

@@ -18,7 +18,7 @@ public class BD {
             // Establecer la conexión a la base de datos
             con = DriverManager.getConnection("jdbc:mysql://localhost/chat", "root", "");
             
-            System.out.println("Conexión establecida correctamente.");
+            //System.out.println("Conexión establecida correctamente.");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(BD.class.getName()).log(Level.SEVERE, null, ex);
             System.err.println("Error: No se ha encontrado el controlador de la base de datos.");
@@ -36,7 +36,7 @@ public class BD {
         if (con != null) {
             try {
                 con.close();
-                System.out.println("Conexión cerrada correctamente.");
+                //System.out.println("Conexión cerrada correctamente.");
             } catch (SQLException ex) {
                 Logger.getLogger(BD.class.getName()).log(Level.SEVERE, null, ex);
                 System.err.println("Error al cerrar la conexión: " + ex.getMessage());

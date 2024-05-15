@@ -19,13 +19,13 @@ import models.Message;
 // del 31 al 45 en queries
 public class MessagesController extends BD {
     
-    public boolean SendMessageToServer(String Message, int chatId, int userId){
+    public boolean SendMessageToServer(String Message, int chatId, int userId, String ip){
         // conexion al server, el server se encargara de realizar la consulta a la bd
         Socket socket;
         DataOutputStream out;
         BufferedReader in;
         try {
-            socket = new Socket("192.168.100.76", 1234); // Usa la IP de tu servidor
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
@@ -71,30 +71,82 @@ public class MessagesController extends BD {
 //        }
     }
     
-    public List<Message> GetMessages(int chatId)
+    public List<Message> GetMessages(int chatId, String ip)
     {
         List<Message> mensajesChat = new ArrayList<Message>();
         Message mensaje;
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet res;
+        
+        // conexion al server, el server se encargara de realizar la consulta a la bd
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("SELECT contenido, usuarioId FROM mensajes WHERE chat_Id = ?");
-            sql.setInt(1, chatId);
-            res = sql.executeQuery();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             
-            while (res.next()) {
+            // consulta al server con los datos requeridos
+            String sql;
+            // se envia un string con el numero de la query a ejecutar en el server y los datos 
+            // necesarios para la ejecucion de la query
+            sql = "32:" + chatId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            
+            // recibir el resultado de la consulta del server
+            String resultado;
+            while(true)
+            {
+                out.writeBytes("Recibido");
+                
+                resultado = in.readLine();
+                
+                if(resultado.equals("Mensajes Terminados"))
+                {
+                    break;
+                }
+                System.out.println(resultado);
+                String[] parts = resultado.split(":");
+                
                 mensaje = new Message();
-                mensaje.setMessageContent(res.getString("contenido"));
-                mensaje.setUserId(res.getInt("UsuarioId"));
+                mensaje.setUserId(Integer.parseInt(parts[0]));
+                mensaje.setMessageContent(parts[1]);
+                
                 mensajesChat.add(mensaje);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(MessagesController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            bd.closeConnection();
+            
+            
+            // manejar la salida entregada por el server por parte de la bd
+            return mensajesChat;
+            
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return mensajesChat;
+        
+        ////////////////////////////////////
+//        List<Message> mensajesChat = new ArrayList<Message>();
+//        Message mensaje;
+//        BD bd = new BD();
+//        PreparedStatement sql;
+//        ResultSet res;
+//        try {
+//            sql = bd.getCon().prepareStatement("SELECT contenido, usuarioId FROM mensajes WHERE chat_Id = ?");
+//            sql.setInt(1, chatId);
+//            res = sql.executeQuery();
+//            
+//            while (res.next()) {
+//                mensaje = new Message();
+//                mensaje.setMessageContent(res.getString("contenido"));
+//                mensaje.setUserId(res.getInt("UsuarioId"));
+//                mensajesChat.add(mensaje);
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(MessagesController.class.getName()).log(Level.SEVERE, null, ex);
+//        } finally {
+//            bd.closeConnection();
+//        }
+//        return mensajesChat;
     }
     
     public boolean DeleteMessagesFromChat(int chatId)
