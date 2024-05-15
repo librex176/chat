@@ -147,6 +147,7 @@ public class ListaConectados extends JFrame {
                         // Según la opción seleccionada por el usuario
                         if (opcion == JOptionPane.YES_OPTION) {
                             // Iniciar el chat
+                            timer.stop();
                             ChatIndividual chat = new ChatIndividual(userId, userConectadoId, nombreSeleccionado, ip);
                             chat.setVisible(true);
                             dispose();
