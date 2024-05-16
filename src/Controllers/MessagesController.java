@@ -1,7 +1,6 @@
 
 package Controllers;
 
-import bd.BD;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,7 +17,7 @@ import models.Message;
 import models.GroupMessage;
 
 // del 31 al 45 en queries
-public class MessagesController extends BD {
+public class MessagesController{
     
     public boolean SendMessageToServer(String Message, int chatId, int userId, String ip){
         // conexion al server, el server se encargara de realizar la consulta a la bd
@@ -209,7 +208,9 @@ public class MessagesController extends BD {
             while(true)
             {
                 resultado = in.readLine();
-                
+                if(resultado == null){
+                    break;
+                }
                 if(resultado.equals("Mensajes Terminados"))
                 {
                     break;

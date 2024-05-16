@@ -20,7 +20,7 @@ public class IniciarSesion extends JFrame {
     private JLabel etiqueta1 = new JLabel("Usuario:");
     private JLabel etiqueta2 = new JLabel("Contraseña");
     
-    public String IP = "192.168.0.53";
+    public String IP = "192.168.3.46";
 
     
     public IniciarSesion() {
@@ -111,7 +111,7 @@ public class IniciarSesion extends JFrame {
             if (usuarioId != 0) {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Inicio de sesion exitoso");
-                usuarioController.ChangeStatus(usuarioId, true);
+                usuarioController.ChangeStatus(usuarioId,IP);
                 ListasMenu gui = new ListasMenu(usuarioId, IP);
                 gui.setVisible(true);
                 // Hacer invisible esta ventana

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Amigos;
-import bd.BD;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -20,27 +19,26 @@ import java.net.Socket;
 import java.util.List;
 
 // del 1 al 15 en queries
-public class AmigosController extends BD{
+public class AmigosController{
         
-    public String selectNameByUserId(int usuarioId)
+    public String selectNameByUserId(int usuarioId, String ip)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         String nombre = null;
-        ResultSet r;
         try
         {
-            sql = bd.getCon().prepareStatement("SELECT NombreUsuario FROM usuarios WHERE UsuarioId=?");
-            
-            sql.setInt(1,usuarioId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                nombre = r.getString("NombreUsuario");
-            }
-            
-            return nombre;
-        } catch (SQLException ex) {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "2:" + usuarioId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            // recibir el resultado de la consulta del server
+            String resultado = in.readLine();
+            return resultado;
+        } catch (IOException ex) {
             Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;

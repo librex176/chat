@@ -3,10 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ChatGrupal.java</file>
-            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ListaGrupos.java</file>
-            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Controllers/GruposController.java</file>
-            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ChatIndividual.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Controllers/RequestsController.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Vistas/IniciarSesion.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Controllers/ChatsController.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Vistas/ChatGrupal.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Controllers/MessagesController.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Vistas/ListasMenu.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Controllers/UsuarioController.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Controllers/AmigosController.java</file>
+            <file>file:/C:/Users/agael/OneDrive/Documentos/CETI/8vo/Progra%20Avanzada%20II/chat/chat/src/Vistas/ListaGrupos.java</file>
         </group>
     </open-files>
 </project-private>

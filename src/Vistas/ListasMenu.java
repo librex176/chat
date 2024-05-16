@@ -123,7 +123,7 @@ public class ListasMenu extends JFrame{
                 ChatsController chatsController = new ChatsController();
                 AmigosController amigosController = new AmigosController();
                 MessagesController messagesController = new MessagesController();
-                boolean cerradoExitosamente = usuarioController.cerrarSesion(userId); 
+                boolean cerradoExitosamente = usuarioController.cerrarSesion(userId,ip); 
                 
                 // delete all user chats with non-friends
                 List<IndividualChatModel> chatsWithUser = chatsController.SearchChats(userId, ip);

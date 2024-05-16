@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import models.GroupMessage;
 import models.Message;
+import Controllers.AmigosController;
 
 public class ChatGrupal extends JFrame{
     
@@ -141,7 +142,9 @@ public class ChatGrupal extends JFrame{
                             if (senderId == userId) {
                                 chatArea.append("You: " + messageContent + "\n");
                             } else {
-                                chatArea.append(messageContent + "\n");
+                                AmigosController amigos = new AmigosController();
+                                String Sender = amigos.selectNameByUserId(senderId,ip);
+                                chatArea.append(Sender + ": " + messageContent + "\n");
                             }
                         }
                     });

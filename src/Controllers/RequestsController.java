@@ -4,7 +4,6 @@
  */
 package Controllers;
 
-import bd.BD;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 // del 46 al 60 en queries
-public class RequestsController extends BD{
+public class RequestsController{
     String ip;
 
     public RequestsController(String ip) {

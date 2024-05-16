@@ -3,7 +3,6 @@ package chat;
 import Vistas.IniciarSesion;
 import Vistas.ListasMenu;
 import Vistas.RegistrarUsuario;
-import bd.BD;
 import java.sql.Connection;
 
 import javax.swing.JFrame;
@@ -19,8 +18,6 @@ public class Chat {
      */
     public static void main(String[] args) {
         
-        BD bd = new BD();
-        Connection connection = bd.getCon();
         
 //        ListasMenu guiMenu = new ListasMenu(1);
 //        guiMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Definir la operación de cierre

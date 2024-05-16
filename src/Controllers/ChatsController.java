@@ -1,7 +1,6 @@
 
 package Controllers;
 
-import bd.BD;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;

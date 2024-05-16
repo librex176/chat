@@ -4,7 +4,6 @@
  */
 package Controllers;
 
-import bd.BD;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -19,7 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import models.Grupos;
 
-public class GruposController extends BD{
+public class GruposController{
     String ip;
     public GruposController(String ip) {
         this.ip = ip;
