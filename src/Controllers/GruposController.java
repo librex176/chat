@@ -99,25 +99,23 @@ public class GruposController extends BD{
     
     public String selectNombreGrupo(int grupoId)
     {
-        PreparedStatement sql;
-        String nombreGrupo=null;
-        ResultSet r;
-        try
-        {
-            sql = getCon().prepareStatement("SELECT nombre FROM grupos WHERE grupoId=?");
-            
-            sql.setInt(1,grupoId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                nombreGrupo = r.getString("nombre");
-            }
-            
-            return nombreGrupo;
-        } catch (SQLException ex) {
-            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "87:" + grupoId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            return resultado ;
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        return null;
+        return "0";
     }
     
     public int selectCuentaParticipantes(int grupoId) 
@@ -245,7 +243,7 @@ public class GruposController extends BD{
         return false;
     }
     
-    public ArrayList<String> selectMiembrosGrupos(int grupoId, int usuarioId)
+    public ArrayList<String[]> selectMiembrosGrupos(int grupoId, int status)
     {
         Socket socket;
         DataOutputStream out;
@@ -254,23 +252,24 @@ public class GruposController extends BD{
             socket = new Socket(ip, 1234);
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String sql= "85:" + grupoId ;
+            String sql= "85:" + grupoId + ":" + status;
             out.writeBytes(sql + "\n");
             out.flush();
             // recibir el resultado de la consulta del server
-            ArrayList<String> miembros = new ArrayList<>();
+            ArrayList<String[]> miembros = new ArrayList<>();
             String resultado;
             resultado = in.readLine();
             if(resultado!=null)
             {
-                String[] miembrosStr = resultado.split(";");
-                for(String miembroStr: miembrosStr)
+                String[] parts = resultado.split(";");
+                for(String p : parts)
                 {
-                    String[] miembro = miembroStr.split(":");
-                    miembros.add(miembro[0]);
-                    miembros.add(miembro[1]);
+                    String[] ob = p.split(":");
+                    miembros.add(ob);
                 }
-                return miembros;
+                if(!miembros.isEmpty()){
+                    return miembros;
+                }
             }
         } catch (IOException e) {
             System.out.println("Error: "+ e.getMessage());
@@ -287,15 +286,54 @@ public class GruposController extends BD{
             socket = new Socket(ip, 1234); // Usa la IP de tu servidor
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String sql = "175:" + grupoId;
+            String sql = "86:" + grupoId + ":" + usuarioId;
             out.writeBytes(sql + "\n");
             out.flush();
-            int resultado = in.read();
-            return resultado > 0; 
+            String resultado = in.readLine();
+            //System.out.println("Resultado: "+ resultado);
+            return resultado.equals("true"); 
         } catch (IOException e) {
             System.out.println("Error: "+ e.getMessage());
         }
         return false;
+    }
+    
+    public List<Integer> selectMiembrosGruposInvitaciones(int grupoId)
+    {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql= "88:" + grupoId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            // recibir el resultado de la consulta del server
+            List<Integer> miembros = new ArrayList<>();
+            String resultado;
+            resultado = in.readLine();
+            if(resultado!=null)
+            {
+                System.out.println("resultado: " + resultado);
+                String[] parts = resultado.split(":");
+                for(String part : parts)
+                {
+                    //System.out.println("part " + part);
+                    miembros.add(Integer.parseInt(part));
+                }
+                if(!miembros.isEmpty()){
+                    return miembros;
+                }
+            } else
+            {
+                System.out.println("resultado es null");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
+        }
+        return null;
     }
     
 }

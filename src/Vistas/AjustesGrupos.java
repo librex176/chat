@@ -25,6 +25,7 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import Controllers.UsuarioController;
+import javax.swing.JButton;
 import javax.swing.Timer;
 
 public class AjustesGrupos extends JFrame {
@@ -33,6 +34,7 @@ public class AjustesGrupos extends JFrame {
     int userId;
     String ip;
     ArrayList<String[]> conectados;
+    ArrayList<String[]> desconectados;
     Timer timer;
     DefaultListModel<String> modeloListaConectados;
     DefaultListModel<String> modeloListaDesconectados;
@@ -94,64 +96,172 @@ public class AjustesGrupos extends JFrame {
         // Agregar el JList a un JScrollPane y luego al panel para los desconectados
         panelDesconectados.add(new JScrollPane(listaDesconectados), BorderLayout.CENTER);
 
-
-        // Configurar el diseño horizontal
+        JButton addButton = new JButton("+");
+        addButton.setFont(new Font("Arial", Font.BOLD, 20));
+        
+         // Configurar el diseño horizontal
         layout.setHorizontalGroup(
             layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(a)  // Etiqueta para la columna 1
-                    .addComponent(panelConectados)  // Panel para la columna 1
+                    .addComponent(a)
+                    .addComponent(panelConectados)
                 )
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(b)  // Etiqueta para la columna 2
-                    .addComponent(panelDesconectados)  // Panel para la columna 2
+                    .addComponent(b)
+                    .addComponent(panelDesconectados)
                 )
+                .addComponent(addButton)
         );
 
         // Configurar el diseño vertical
         layout.setVerticalGroup(
             layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(a)  // Etiqueta para la columna 1
-                    .addComponent(b)  // Etiqueta para la columna 2
+                    .addComponent(a)
+                    .addComponent(b)
                 )
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(panelConectados)  // Panel para la columna 1
-                    .addComponent(panelDesconectados)  // Panel para la columna 2
+                    .addComponent(panelConectados)
+                    .addComponent(panelDesconectados)
                 )
+                .addComponent(addButton)
         );
+        
         boolean isOwner = gruposController.selectDuenoId(grupoId, userId);
         if(isOwner)
         {
-            listaConectados.addListSelectionListener(new ListSelectionListener() {
-                @Override
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()) {
-                        int index = listaConectados.getSelectedIndex();
-                        if (index != -1) {
-                            String nombreSeleccionado = modeloListaConectados.getElementAt(index);
-                            int userConectadoId = Integer.parseInt(conectados.get(index)[0]);
-                            System.out.println("nombre seleccionado: " + nombreSeleccionado);
-                            JPanel panelConfirmacion = new JPanel();
-                            panelConfirmacion.add(new JLabel("¿Desea eliminar a " + nombreSeleccionado + " del grupo?"));
-                            // Mostrar el diálogo de confirmación
-                            int opcion = JOptionPane.showConfirmDialog(
+            listaConectados.addListSelectionListener((ListSelectionEvent e) -> {
+                if (!e.getValueIsAdjusting()) {
+                    int index = listaConectados.getSelectedIndex();
+                    if (index != -1) {
+                        String nombreSeleccionado = modeloListaConectados.getElementAt(index);
+                        int userConectadoId = Integer.parseInt(conectados.get(index)[1]);
+                        JPanel panelConfirmacion = new JPanel();
+                        panelConfirmacion.add(new JLabel("¿Desea eliminar a " + nombreSeleccionado + " del grupo?"));
+                        // Mostrar el diálogo de confirmación
+                        int opcion = JOptionPane.showConfirmDialog(
                                 AjustesGrupos.this,
                                 panelConfirmacion,
                                 "Confirmación",
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.QUESTION_MESSAGE
-                            );
-                            if (opcion == JOptionPane.YES_OPTION) {
-                              // gruposController.
-                            } 
+                        );
+                        if (opcion == JOptionPane.YES_OPTION) {
+                            boolean esOno = gruposController.selectDuenoId(grupoId, userConectadoId);
+                            if(esOno)
+                            {
+                                int response = JOptionPane.showConfirmDialog(
+                                    AjustesGrupos.this,
+                                    "¿Estás seguro de que deseas salir del grupo? Borrará todo debido a que eres el dueño.",
+                                    "Confirmación",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE
+                                );
+                                if (response == JOptionPane.YES_OPTION) {
+                                    gruposController.deleteMensajesGrupos(grupoId);
+                                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                                    if (comprobar) {
+                                        gruposController.deleteGrupo(grupoId);
+                                        timer.stop();
+                                        dispose();
+                                        ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
+                                        listasGrupos.setVisible(true);
+                                    }
+                                }
+                            }else {
+                                int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);
+                                System.out.println("participantes es: " + cantidadParticipantes);
+                                if (cantidadParticipantes <= 2) {
+                                    System.out.println("entra minimo participantes");
+                                    gruposController.deleteMensajesGrupos(grupoId);
+                                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                                    if (comprobar) {
+                                        System.out.println("comprobacion");
+                                        gruposController.deleteGrupo(grupoId);
+                                    }
+                                } else {
+                                    System.out.println("entra solo el solito");
+                                    gruposController.deleteUsuarioRecibeId(grupoId, userId);
+                                }
+                                timer.stop();
+                                dispose();
+                                ChatGrupal view = new ChatGrupal(userId, grupoId, ip);
+                                view.setVisible(true);
+                            }
+                        }
+                    }
+                }
+            });
+            addButton.addActionListener((ActionEvent e) -> {
+                AgregarUsuariosGrupo agregarUsuarios = new AgregarUsuariosGrupo(grupoId, userId, ip);
+                agregarUsuarios.setVisible(true);
+                dispose();
+                setVisible(false);
+            });
+            listaDesconectados.addListSelectionListener((ListSelectionEvent e) -> {
+                if (!e.getValueIsAdjusting()) {
+                    int index = listaDesconectados.getSelectedIndex();
+                    if (index != -1) {
+                        String nombreSeleccionado = modeloListaDesconectados.getElementAt(index);
+                        int userConectadoId = Integer.parseInt(desconectados.get(index)[1]);
+                        JPanel panelConfirmacion = new JPanel();
+                        panelConfirmacion.add(new JLabel("¿Desea eliminar a " + nombreSeleccionado + " del grupo?"));
+                        // Mostrar el diálogo de confirmación
+                        int opcion = JOptionPane.showConfirmDialog(
+                                AjustesGrupos.this,
+                                panelConfirmacion,
+                                "Confirmación",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE
+                        );
+                        if (opcion == JOptionPane.YES_OPTION) {
+                            boolean esOno = gruposController.selectDuenoId(grupoId, userConectadoId);
+                            if(esOno)
+                            {
+                                int response = JOptionPane.showConfirmDialog(
+                                    AjustesGrupos.this,
+                                    "¿Estás seguro de que deseas salir del grupo? Borrará todo debido a que eres el dueño.",
+                                    "Confirmación",
+                                    JOptionPane.YES_NO_OPTION,
+                                    JOptionPane.QUESTION_MESSAGE
+                                );
+                                if (response == JOptionPane.YES_OPTION) {
+                                    gruposController.deleteMensajesGrupos(grupoId);
+                                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                                    if (comprobar) {
+                                        gruposController.deleteGrupo(grupoId);
+                                        timer.stop();
+                                        dispose();
+                                        ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
+                                        listasGrupos.setVisible(true);
+                                    }
+                                }
+                            }else {
+                                int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);
+                                System.out.println("participantes es: " + cantidadParticipantes);
+                                if (cantidadParticipantes <= 2) {
+                                    //System.out.println("entra minimo participantes");
+                                    gruposController.deleteMensajesGrupos(grupoId);
+                                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                                    if (comprobar) {
+                                        //System.out.println("comprobacion");
+                                        gruposController.deleteGrupo(grupoId);
+                                    }
+                                } else {
+                                    System.out.println("entra solo el solito");
+                                    gruposController.deleteUsuarioRecibeId(grupoId, userConectadoId);
+                                }
+                                timer.stop();
+                                dispose();
+                                ChatGrupal view = new ChatGrupal(userId, grupoId, ip);
+                                view.setVisible(true);
+                            }
                         }
                     }
                 }
             });
         }
         
-
         // Llamar al método para actualizar la lista de conectados al inicio
         actualizarListaConectados(modeloListaConectados);
         // Llamar al método para actualizar la lista de desconectados al inicio
@@ -162,27 +272,23 @@ public class AjustesGrupos extends JFrame {
     }
 
     private void actualizarListaConectados(DefaultListModel<String> modeloListaConectados) {
-        UsuarioController usuariosController = new UsuarioController(ip);
-        conectados = usuariosController.usuariosPorConexionServer(1, userId, ip);
+        GruposController gruposController = new GruposController(ip);
+        conectados = gruposController.selectMiembrosGrupos(grupoId, 1);
         modeloListaConectados.clear();
         if(conectados != null){
-            // Limpiar el modelo de lista de conectados
-            // Agregar los conectados al modelo de lista de conectados
             for (String[] u : conectados) {
-                modeloListaConectados.addElement(u[1]);
+                modeloListaConectados.addElement(u[0]);
             }
         }
     }
 
     private void actualizarListaDesconectados(DefaultListModel<String> modeloListaDesconectados) {
-        UsuarioController usuariosController = new UsuarioController(ip);
-        ArrayList<String[]> desconectados = usuariosController.usuariosPorConexionServer(0, userId, ip);
+        GruposController gruposController = new GruposController(ip);
+        desconectados = gruposController.selectMiembrosGrupos(grupoId, 0);
         modeloListaDesconectados.clear();
         if(desconectados != null){
-            // Limpiar el modelo de lista de desconectados
-            // Agregar los desconectados al modelo de lista de desconectados
             for (String[] u : desconectados) {
-                modeloListaDesconectados.addElement(u[1]);
+                modeloListaDesconectados.addElement(u[0]);
             }
         }
     }
@@ -201,17 +307,14 @@ public class AjustesGrupos extends JFrame {
 
         this.addWindowListener(windowListener);
     }
+    
     private void iniciarTimer() {
         // Crear el timer que se ejecutará cada 4 segundos
         timer = new Timer(3000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Llamar al método para actualizar la lista de conectados
                 actualizarListaConectados(modeloListaConectados);
                 actualizarListaDesconectados(modeloListaDesconectados);
-                //actualizarListaConectados((DefaultListModel<String>) ((JList<?>) ((JScrollPane) ((JPanel) getContentPane().getComponent(1)).getComponent(0)).getViewport().getView()).getModel());
-                // Llamar al método para actualizar la lista de desconectados
-               // actualizarListaDesconectados((DefaultListModel<String>) ((JList<?>) ((JScrollPane) ((JPanel) getContentPane().getComponent(2)).getComponent(0)).getViewport().getView()).getModel());
             }
         });
         // Iniciar el timer
