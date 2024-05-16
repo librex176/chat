@@ -22,7 +22,116 @@ public class UsuarioController {
     public UsuarioController(String ip) {
         this.ip = ip;
     }
-    
+        public String actualizarPass(int userId) {
+    // Conexion al servidor, el servidor se encargara de realizar la consulta a la base de datos
+    Socket socket;
+    DataOutputStream out;
+    BufferedReader in;
+    try {
+        socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+        out = new DataOutputStream(socket.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
+        // Consulta al servidor con los datos requeridos
+        String sql;
+        // Se envia un string con el numero de la query a ejecutar en el servidor y los datos 
+        // necesarios para la ejecucion de la query
+        sql = "9:" + userId ;
+        System.out.println(sql);
+        out.writeBytes(sql + "\n");
+        out.flush();
+        
+        // Recibir el resultado de la consulta del servidor
+        String resultado = "0";
+         resultado = in.readLine();
+         System.out.println(resultado);
+         return resultado;
+        
+        
+        
+        
+        
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        System.out.println(e.getMessage());
+    }
+    return "aqui esta el error";
+}
+    public String verPass(int userId) {
+    // Conexion al servidor, el servidor se encargara de realizar la consulta a la base de datos
+    Socket socket;
+    DataOutputStream out;
+    BufferedReader in;
+    try {
+        socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+        out = new DataOutputStream(socket.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
+        // Consulta al servidor con los datos requeridos
+        String sql;
+        // Se envia un string con el numero de la query a ejecutar en el servidor y los datos 
+        // necesarios para la ejecucion de la query
+        sql = "8:" + userId;
+        System.out.println(sql);
+        out.writeBytes(sql + "\n");
+        out.flush();
+        
+        // Recibir el resultado de la consulta del servidor
+        String resultado = "0";
+         resultado = in.readLine();
+         System.out.println(resultado);
+         return resultado;
+        
+        
+        
+        
+        
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+        System.out.println(e.getMessage());
+    }
+    return "aqui esta el error";
+}
+    public int verificarPregunta(String nombreUsuario, String pregunta, String ip) {
+    // Conexion al servidor, el servidor se encargara de realizar la consulta a la base de datos
+    Socket socket;
+    DataOutputStream out;
+    BufferedReader in;
+    try {
+        socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+        out = new DataOutputStream(socket.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
+        // Consulta al servidor con los datos requeridos
+        String sql;
+        // Se envia un string con el numero de la query a ejecutar en el servidor y los datos 
+        // necesarios para la ejecucion de la query
+        sql = "7:" + nombreUsuario + ":" + pregunta;
+        System.out.println(sql);
+        out.writeBytes(sql + "\n");
+        out.flush();
+        
+        // Recibir el resultado de la consulta del servidor
+        String resultado = "0";
+         resultado = in.readLine();
+        System.out.println(resultado);
+        if(resultado.equals("0")){
+            return 0;
+        }else{
+            return Integer.parseInt(resultado);
+        }
+        
+        
+        
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
     //Validar inicio de sesion
     public String verificarCredenciales(String nombreUsuario, String contraseña, String ip) {
         // conexion al server, el server se encargara de realizar la consulta a la bd
@@ -90,8 +199,10 @@ public class UsuarioController {
             String sql;
             // se envia un string con el numero de la query a ejecutar en el server y los datos 
             // necesarios para la ejecucion de la query
-            sql = "2:" + nombreUsuario + ":" + contraseña + ":" + cancionFavorita;
-            out.writeBytes(sql);
+            sql = "6:" + nombreUsuario + ":" + contraseña + ":" + cancionFavorita;
+            System.out.println(sql);
+            out.writeBytes(sql + "\n");
+            out.flush();
             
             // recibir el resultado de la consulta del server
             String resultado = in.readLine();
