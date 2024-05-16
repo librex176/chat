@@ -77,7 +77,7 @@ public class GroupRequests extends JFrame {
         );
 
         // Llenar las listas con las solicitudes de grupos
-        if (solicitudesGrupos != null) {
+        if (solicitudesGrupos != null && !solicitudesGrupos.isEmpty()) {
             for (int i = 0; i < solicitudesGrupos.size(); i += 3) {
                 String Nombre = solicitudesGrupos.get(i + 1);
                 String UsuarioDueno = solicitudesGrupos.get(i + 2);
