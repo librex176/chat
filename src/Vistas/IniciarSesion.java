@@ -20,8 +20,9 @@ public class IniciarSesion extends JFrame {
     private JLabel etiqueta1 = new JLabel("Usuario:");
     private JLabel etiqueta2 = new JLabel("Contraseña");
     
-    public String IP = "192.168.100.76";
-
+    public String IP = "192.168.1.239";
+    public int UserId = 0;    
+    public int counter = 0;
     
     public IniciarSesion() {
         
@@ -101,7 +102,17 @@ public class IniciarSesion extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String nombreUsuario = textField1.getText();
             String contraseña = textField2.getText();
-
+            
+            if (nombreUsuario.isEmpty() || contraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(IniciarSesion.this, "Por favor, complete todos los campos");
+            counter ++;
+                if(counter >= 3){
+                    RegistrarUsuario ventanaRegistrar = new RegistrarUsuario(IP);
+                ventanaRegistrar.setVisible(true);
+                }
+            return;
+        }
+            
             
             UsuarioController usuarioController = new UsuarioController(IP);
             int usuarioId = Integer.parseInt(usuarioController.verificarCredenciales(nombreUsuario, contraseña, IP));
@@ -119,6 +130,12 @@ public class IniciarSesion extends JFrame {
             } else {
                 
                 JOptionPane.showMessageDialog(IniciarSesion.this, "Datos incorrectos");
+                counter ++;
+                if(counter >= 3){
+                    RegistrarUsuario ventanaRegistrar = new RegistrarUsuario(IP);
+                ventanaRegistrar.setVisible(true);
+                }
+                
             }
          }
         
@@ -127,7 +144,7 @@ public class IniciarSesion extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             
-            RestablecerContraseña ventanaRestablecerContraseña = new RestablecerContraseña();
+            RestablecerContraseña ventanaRestablecerContraseña = new RestablecerContraseña(IP,UserId );
             ventanaRestablecerContraseña.setVisible(true);
         }
         });
