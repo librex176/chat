@@ -6,11 +6,9 @@ package Vistas;
 
 import Controllers.GruposController;
 import Controllers.RequestsController;
-import Controllers.UsuarioController;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -26,13 +24,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
-/**
- *
- * @author Samantha
- */
+
 public class GroupRequests extends JFrame {
-    private int userId;
-    private String ip;
+    private final int userId;
+    private final String ip;
 
     public GroupRequests(int userId, String ip) {
         super();
@@ -43,7 +38,6 @@ public class GroupRequests extends JFrame {
     }
 
     private void initComponents() {
-       
         RequestsController requestsController = new RequestsController(ip);
 
         ArrayList<String> solicitudesGrupos = requestsController.obtenerSolicitudesGrupos(userId);
@@ -83,7 +77,7 @@ public class GroupRequests extends JFrame {
         );
 
         // Llenar las listas con las solicitudes de grupos
-        if (solicitudesGrupos != null) {
+        if (solicitudesGrupos != null && !solicitudesGrupos.isEmpty()) {
             for (int i = 0; i < solicitudesGrupos.size(); i += 3) {
                 String Nombre = solicitudesGrupos.get(i + 1);
                 String UsuarioDueno = solicitudesGrupos.get(i + 2);
@@ -101,43 +95,58 @@ public class GroupRequests extends JFrame {
                     int selectedIndex = gruposList.getSelectedIndex();
                     if (selectedIndex != -1) {
                         int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
-                        requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);//
+                        requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 2);
                         dispose();
                         RequestsMenu view = new RequestsMenu(userId, ip);
                         view.setVisible(true);
                     }
                 });
-                
 
                 rechazarGrupoButton.addActionListener((ActionEvent e) -> {
                     int selectedIndex = gruposList.getSelectedIndex();
                     if (selectedIndex != -1) {
                         int invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
-                        int grupoId = gruposController.selectGrupoIdInvitaciones(invitacionId);//
-                        System.out.println("grupoId: "+grupoId);
-                        int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);//
-                        System.out.println("Cant participantes: "+ cantidadParticipantes);
-                        if(cantidadParticipantes<=2)
-                        {
-                            
-                            boolean borradoMensajes = gruposController.deleteMensajesGrupos(grupoId);//
-                            System.out.println("Se borro mensajes: "+borradoMensajes);
-                            boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);//
-                            System.out.println("Borrar invitaciones grupos: " + comprobar);
-                            if(comprobar)
-                            {
-                                boolean verificar = gruposController.deleteGrupo(grupoId);//
-                                System.out.println("Borrar grupos: " + verificar);
+                        
+                        int response = JOptionPane.showConfirmDialog(
+                            GroupRequests.this,
+                            "¿Estás seguro de que deseas rechazar esta invitación?",
+                            "Confirmación",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE
+                        );
+                        
+                        if (response == JOptionPane.YES_OPTION) {
+                            int grupoId = gruposController.selectGrupoIdInvitaciones(invitacionId);
+                            System.out.println("grupoId: " + grupoId);
+                            if (grupoId != -1) {
+                                int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);
+                                System.out.println("Cant participantes: " + cantidadParticipantes);
+                                if (cantidadParticipantes <= 2) {
+                                    boolean borradoMensajes = gruposController.deleteMensajesGrupos(grupoId);
+                                    System.out.println("Se borro mensajes: " + borradoMensajes);
+                                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                                    System.out.println("Borrar invitaciones grupos: " + comprobar);
+                                    if (comprobar) {
+                                        boolean verificar = gruposController.deleteGrupo(grupoId);
+                                        System.out.println("Borrar grupos: " + verificar);
+                                    }
+                                    dispose();
+                                    RequestsMenu view = new RequestsMenu(userId, ip);
+                                    view.setVisible(true);
+                                } else {
+                                    invitacionId = Integer.parseInt(solicitudesGrupos.get(selectedIndex * 3));
+                                    requestsController.actualizarEstadoSolicitudGrupo(invitacionId, 3);
+                                    dispose();
+                                    RequestsMenu view = new RequestsMenu(userId, ip);
+                                    view.setVisible(true);
+                                }
                             }
                         }
-                        dispose();
-                        RequestsMenu view = new RequestsMenu(userId, ip);
-                        view.setVisible(true);
                     }
                 });
             }
         } else {
-             JOptionPane.showMessageDialog(GroupRequests.this, "No tienes solicitudes de grupos");
+            JOptionPane.showMessageDialog(GroupRequests.this, "No tienes solicitudes de grupos");
         }
 
         // Empaquetar y mostrar la ventana
@@ -145,7 +154,6 @@ public class GroupRequests extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
-
 
     private void addWindowListener() {
         // Crear una instancia del WindowListener

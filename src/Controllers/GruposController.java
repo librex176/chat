@@ -99,174 +99,241 @@ public class GruposController extends BD{
     
     public String selectNombreGrupo(int grupoId)
     {
-        PreparedStatement sql;
-        String nombreGrupo=null;
-        ResultSet r;
-        try
-        {
-            sql = getCon().prepareStatement("SELECT nombre FROM grupos WHERE grupoId=?");
-            
-            sql.setInt(1,grupoId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                nombreGrupo = r.getString("nombre");
-            }
-            
-            return nombreGrupo;
-        } catch (SQLException ex) {
-            Logger.getLogger(AmigosController.class.getName()).log(Level.SEVERE, null, ex);
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "87:" + grupoId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            String resultado = in.readLine();
+            //System.out.println(resultado);
+            return resultado ;
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        return null;
+        return "0";
     }
     
     public int selectCuentaParticipantes(int grupoId) 
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int cantidadInvitaciones = -1;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("SELECT count(*) as cant from invitacionesgrupos where grupoId=? AND status<=2");
-            sql.setInt(1,grupoId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                cantidadInvitaciones = r.getInt("cant");
-            }
-            return cantidadInvitaciones;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "80:" + grupoId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            int resultado = in.read();
+            //System.out.println(resultado);
+            resultado =  resultado > 0 ? resultado : 0;
+            return resultado ;
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        return cantidadInvitaciones;
+        return 0;
     }
     
     public int selectGrupoIdInvitaciones(int invitacionId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int grupoId = -1;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("Select grupoId from invitacionesgrupos where invitacionId=?");
-            sql.setInt(1,invitacionId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                grupoId = r.getInt("grupoId");
-            }
-            return grupoId;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql= "79:" + invitacionId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            int resultado = in.read();
+            //System.out.println(resultado);
+            resultado =  resultado > 0 ? resultado : 0;
+            return resultado ; 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return grupoId;
+        return 0;
     }
     
     public boolean deleteMensajesGrupos(int grupoId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int comprobar = -1;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("DELETE FROM mensajes_grupales where grupoId=?");
-            sql.setInt(1, grupoId);
-            comprobar = sql.executeUpdate();
-            return comprobar > -1;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "81:" + grupoId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            int resultado = in.read();
+            return resultado > 0; 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return comprobar>-1;
+        return false;
     }
     
     public boolean deleteInvitacionesGrupos(int grupoId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int comprobar = 0;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            System.out.println("el grupoId es: "+ grupoId);
-            sql = bd.getCon().prepareStatement("DELETE FROM invitacionesGrupos where grupoId=?");
-            sql.setInt(1, grupoId);
-            comprobar = sql.executeUpdate();
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "82:" + grupoId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            int resultado = in.read();
+            return resultado > 0; 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return comprobar>0;
+        return false;
     }
     
     public boolean deleteGrupo(int grupoId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int comprobar = 0;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("DELETE FROM grupos where grupoId=?");
-            sql.setInt(1, grupoId);
-            comprobar = sql.executeUpdate();
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket(ip, 1234); 
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "83:" + grupoId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            int resultado = in.read();
+            return resultado > 0; 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return comprobar>0;
+        return false;
     }
     
     public boolean selectDuenoId(int grupoId, int usuarioId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        ResultSet r;
-        int usuarioDuenoId = 0;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("Select usuarioDuenoId from grupos where grupoId = ?");
-            sql.setInt(1, grupoId);
-            r = sql.executeQuery();
-            while(r.next())
-            {
-                usuarioDuenoId = r.getInt("usuarioDuenoId");
-            }
-            return usuarioId==usuarioDuenoId;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql= "84:" + grupoId + ":" + usuarioId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            String resultado = in.readLine();
+            boolean esVerdad = resultado.equals("true");
+            return esVerdad ; 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return usuarioId==usuarioDuenoId;
+        return false;
     }
     
+    public ArrayList<String[]> selectMiembrosGrupos(int grupoId, int status)
+    {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql= "85:" + grupoId + ":" + status;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            // recibir el resultado de la consulta del server
+            ArrayList<String[]> miembros = new ArrayList<>();
+            String resultado;
+            resultado = in.readLine();
+            if(resultado!=null)
+            {
+                String[] parts = resultado.split(";");
+                for(String p : parts)
+                {
+                    String[] ob = p.split(":");
+                    miembros.add(ob);
+                }
+                if(!miembros.isEmpty()){
+                    return miembros;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
+        }
+        return null;
+    }
     
     public boolean deleteUsuarioRecibeId(int grupoId, int usuarioId)
     {
-        BD bd = new BD();
-        PreparedStatement sql;
-        int comprobar = 0;
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
         try {
-            sql = bd.getCon().prepareStatement("DELETE FROM invitacionesGrupos where grupoId=? AND usuarioRecibeId=?");
-            sql.setInt(1, grupoId);
-            sql.setInt(2, usuarioId);
-            comprobar = sql.executeUpdate();
-            System.out.println("se borra un solo usuario: " + comprobar);
-            return comprobar > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(GruposController.class.getName()).log(Level.SEVERE, null, ex);
-        } finally
-        {
-            bd.closeConnection();
+            socket = new Socket(ip, 1234); // Usa la IP de tu servidor
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql = "86:" + grupoId + ":" + usuarioId;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            String resultado = in.readLine();
+            //System.out.println("Resultado: "+ resultado);
+            return resultado.equals("true"); 
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
         }
-        return comprobar>0;
+        return false;
+    }
+    
+    public List<Integer> selectMiembrosGruposInvitaciones(int grupoId)
+    {
+        Socket socket;
+        DataOutputStream out;
+        BufferedReader in;
+        try {
+            socket = new Socket(ip, 1234);
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            String sql= "88:" + grupoId ;
+            out.writeBytes(sql + "\n");
+            out.flush();
+            // recibir el resultado de la consulta del server
+            List<Integer> miembros = new ArrayList<>();
+            String resultado;
+            resultado = in.readLine();
+            if(resultado!=null)
+            {
+                System.out.println("resultado: " + resultado);
+                String[] parts = resultado.split(":");
+                for(String part : parts)
+                {
+                    //System.out.println("part " + part);
+                    miembros.add(Integer.parseInt(part));
+                }
+                if(!miembros.isEmpty()){
+                    return miembros;
+                }
+            } else
+            {
+                System.out.println("resultado es null");
+            }
+        } catch (IOException e) {
+            System.out.println("Error: "+ e.getMessage());
+        }
+        return null;
     }
     
 }

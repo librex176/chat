@@ -126,6 +126,7 @@ public class ListaAmigos extends JFrame {
                         // Según la opción seleccionada por el usuario
                         if (opcion == JOptionPane.YES_OPTION) {
                             // Iniciar el chat
+                            timer.stop();
                             ChatIndividual chat = new ChatIndividual(userId, userFriendId, nombreSeleccionado, ip);
                             chat.setVisible(true);
                             dispose();
@@ -162,6 +163,7 @@ public class ListaAmigos extends JFrame {
         enviarSolicitud.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timer.stop();
                 SendRequestForm sendRequestForm = new SendRequestForm(userId, ip);
                 sendRequestForm.setVisible(true);
                 dispose();

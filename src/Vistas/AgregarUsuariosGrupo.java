@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Vistas;
+
+import Controllers.GruposController;
 import Controllers.RequestsController;
 import Controllers.UsuarioController;
 import java.awt.BorderLayout;
@@ -13,6 +15,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,41 +26,45 @@ import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
 /**
  *
- * @author Samantha
+ * @author aacar
  */
-public class CreateGroups extends JFrame {
+public class AgregarUsuariosGrupo extends JFrame{
+    int grupoId;
     private JPanel panelPrincipal;
     private JTextField campoUsuarios;
     private JButton btnCrearGrupo;
-    private JTextField campoNombreGrupo;
+    private JLabel campoNombreGrupo;
     int userId;
     String ip;
-    String Nombre;
 
-    public CreateGroups(int userId, String ip) {
-        this.userId  = userId;
+    public AgregarUsuariosGrupo(int grupoId, int userId, String ip) {
+        super();
+        this.grupoId = grupoId;
+        this.userId = userId;
         this.ip = ip;
         initComponents();
-        JOptionPane.showMessageDialog(CreateGroups.this, "Separa los usuarios con comas para enviar las invitaciones.");
+        JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "Separa los usuarios con comas para enviar las invitaciones.");
         setupLayout();
         setupListeners();
         pack();
         setLocationRelativeTo(null);
         addWindowListener();
     }
-
+    
     private void initComponents() {
-        setTitle("Crear Grupo");
+        GruposController gruposController = new GruposController(ip);
+        String nombreGrupo = gruposController.selectNombreGrupo(grupoId);///////////////////////////////
+        setTitle(nombreGrupo);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         panelPrincipal = new JPanel();
         panelPrincipal.setLayout(new BorderLayout());
-        campoNombreGrupo = new JTextField(15);
+        campoNombreGrupo = new JLabel(nombreGrupo);
         campoUsuarios = new JTextField(30); // El campo de texto es más grande para los nombres de usuario
 
-        btnCrearGrupo = new JButton("Crear Grupo");
+        btnCrearGrupo = new JButton("Agregar usuarios");
     }
-
+    
     private void setupLayout() {
         JPanel panelNombreGrupo = new JPanel();
         panelNombreGrupo.setLayout(new FlowLayout());
@@ -74,7 +81,7 @@ public class CreateGroups extends JFrame {
         panelPrincipal.add(panelBotones, BorderLayout.SOUTH);
         add(panelPrincipal);
     }
-
+    
     private void setupListeners() {
         btnCrearGrupo.addActionListener(new ActionListener() {
             @Override
@@ -82,8 +89,8 @@ public class CreateGroups extends JFrame {
                 String usuariosInput = campoUsuarios.getText();
                 String[] nombres = usuariosInput.split(",");
                 
-                if (nombres.length < 2) {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "Debe ingresar al menos 2 nombres de usuario");
+                if (nombres.length < 1) {
+                    JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "Debe ingresar al menos 1 nombre de usuario");
                     return;
                 }
 
@@ -100,15 +107,22 @@ public class CreateGroups extends JFrame {
                 }
 
                 if (nombresRepetidos) {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "No se pueden repetir nombres de usuario");
+                    JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "No se pueden repetir nombres de usuario");
                     return;
                 }
+                
+                
 
                 ArrayList<Integer> idsUsuarios = new ArrayList<>();
+                List<Integer> idUsuariosExistentes = obtenerIdUsuariosPertenecientes();
                 for (String nombre : nombresList) {
                     int idUsuario = obtenerIdUsuario(nombre);
                     if (idUsuario == -1) {
-                        JOptionPane.showMessageDialog(CreateGroups.this, "El usuario '" + nombre + "' no existe");
+                        JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "El usuario '" + nombre + "' no existe");
+                        return;
+                    } else if(idUsuariosExistentes.contains(idUsuario))
+                    {
+                        JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, nombre + " ya es parte del grupo o su invitación ya esta enviada");
                         return;
                     }
                     idsUsuarios.add(idUsuario);
@@ -117,21 +131,18 @@ public class CreateGroups extends JFrame {
                 // Verificar que el usuario no esté enviando una solicitud a sí mismo
                 int idUsuarioActual = userId;
                 if (idsUsuarios.contains(idUsuarioActual)) {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "No puedes enviarte una solicitud a ti mismo");
+                    JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "No puedes enviarte una solicitud a ti mismo");
                     return;
                 }
-                
-                int groupId = InsertarGrupoId();
 
-                boolean solicitudEnviada = enviarSolicitudGrupo(groupId, idsUsuarios);
-
+                boolean solicitudEnviada = enviarSolicitudGrupo(grupoId, idsUsuarios);
                 if (solicitudEnviada) {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "Solicitud de grupo enviada correctamente");
+                    JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "Solicitud de grupo enviada correctamente");
                     dispose();
                     ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
                     listasGrupos.setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(CreateGroups.this, "Error al enviar la solicitud de grupo");
+                    JOptionPane.showMessageDialog(AgregarUsuariosGrupo.this, "Error al enviar la solicitud de grupo");
                 }
             }
         });
@@ -139,18 +150,18 @@ public class CreateGroups extends JFrame {
         pack();
         setLocationRelativeTo(null);
     }
-
+    
     private int obtenerIdUsuario(String nombreUsuario) {
         UsuarioController usuarioController = new UsuarioController(ip);
         int usuarioRecibeId = usuarioController.EncontrarUsuarios(nombreUsuario);
         return usuarioRecibeId;
     }
-
-    private int InsertarGrupoId() {
-        Nombre = campoNombreGrupo.getText();
-        RequestsController requestController = new RequestsController(ip);
-        int groupId = requestController.InsertarGrupo(userId, Nombre);
-        return groupId;
+    
+    private List<Integer> obtenerIdUsuariosPertenecientes()
+    {
+        GruposController grupoController = new GruposController(ip);
+        //System.out.println("groupId " + grupoId);
+        return grupoController.selectMiembrosGruposInvitaciones(grupoId);
     }
 
     private boolean enviarSolicitudGrupo(int groupId, ArrayList<Integer> idsUsuarios) {
@@ -169,12 +180,12 @@ public class CreateGroups extends JFrame {
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
+                AjustesGrupos listasGrupos = new AjustesGrupos(userId, grupoId, ip);
                 listasGrupos.setVisible(true);
                 dispose();
             }
         };
-
         this.addWindowListener(windowListener);
     }
+    
 }
