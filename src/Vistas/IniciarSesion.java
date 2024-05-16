@@ -20,7 +20,7 @@ public class IniciarSesion extends JFrame {
     private JLabel etiqueta1 = new JLabel("Usuario:");
     private JLabel etiqueta2 = new JLabel("Contraseña");
     
-    public String IP = "192.168.1.239";
+    public String IP = "192.168.100.76";
     public int UserId = 0;    
     public int counter = 0;
     

@@ -347,8 +347,6 @@ public class UsuarioController {
             out.flush();
             String resultado = in.readLine();
             
-            //int comprobar = sql.executeUpdate();
-            //return comprobar > 0;
             return resultado.equals("true");    
         } catch (IOException ex) {
             Logger.getLogger(UsuarioController.class.getName()).log(Level.SEVERE, null, ex);

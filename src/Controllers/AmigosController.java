@@ -32,7 +32,7 @@ public class AmigosController{
             socket = new Socket(ip, 1234);
             out = new DataOutputStream(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String sql = "2:" + usuarioId;
+            String sql = "15:" + usuarioId;
             out.writeBytes(sql + "\n");
             out.flush();
             // recibir el resultado de la consulta del server
