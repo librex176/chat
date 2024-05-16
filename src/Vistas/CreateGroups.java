@@ -38,6 +38,7 @@ public class CreateGroups extends JFrame {
         this.userId  = userId;
         this.ip = ip;
         initComponents();
+        JOptionPane.showMessageDialog(CreateGroups.this, "Separa los usuarios con comas para enviar las invitaciones.");
         setupLayout();
         setupListeners();
         pack();

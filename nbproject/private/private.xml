@@ -3,7 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Controllers/MessagesController.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ChatGrupal.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ListaGrupos.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Controllers/GruposController.java</file>
+            <file>file:/C:/Users/artug/Desktop/CETI/PAII/Proyecto2PChat/chat/src/Vistas/ChatIndividual.java</file>
         </group>
     </open-files>
 </project-private>

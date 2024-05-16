@@ -163,6 +163,7 @@ public class ListaAmigos extends JFrame {
         enviarSolicitud.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                timer.stop();
                 SendRequestForm sendRequestForm = new SendRequestForm(userId, ip);
                 sendRequestForm.setVisible(true);
                 dispose();

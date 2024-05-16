@@ -1,16 +1,13 @@
 
 package Vistas;
 
-import Controllers.ChatsController;
 import Controllers.GruposController;
 import Controllers.MessagesController;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -20,7 +17,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-import Vistas.ListaGrupos;
+import javax.swing.JOptionPane;
 
 public class ChatGrupal extends JFrame{
     
@@ -32,8 +29,7 @@ public class ChatGrupal extends JFrame{
     
     MessagesController messagesController = new MessagesController();
     
-    public ChatGrupal(int userId, int groupId, String ip)
-    {
+    public ChatGrupal(int userId, int groupId, String ip) {
         super();
         this.userId = userId; //Quien manda el mensaje
         this.groupId = groupId;
@@ -42,8 +38,7 @@ public class ChatGrupal extends JFrame{
         addWindowListener();
     }
     
-    private void init()
-    {
+    private void init() {
         GruposController gruposController = new GruposController(ip);
         String nombreGrupo = gruposController.selectNombreGrupo(groupId);
         setTitle(nombreGrupo);
@@ -58,22 +53,6 @@ public class ChatGrupal extends JFrame{
         
         // Deshabilita que el area de chat se pueda editar por el usuario
         chatArea.setEditable(false); 
-        
-        if(groupId != -1)
-        {
-            /*List<Message> mensajesEnviados = messagesController.GetMessages(chatId);
-            for(Message mensaje : mensajesEnviados)
-            {
-                if(mensaje.getUserId() == userId)
-                {
-                    chatArea.append("You: " + mensaje.getMessageContent() + "\n");
-                }
-                else
-                {
-                    chatArea.append(chatterName + ": " + mensaje.getMessageContent() + "\n");
-                }
-            }*/
-        }
         
         JScrollPane scrollPane = new JScrollPane(chatArea);
         messageField = new JTextField(20);
@@ -109,18 +88,15 @@ public class ChatGrupal extends JFrame{
         pack();
         setLocationRelativeTo(null); // centrar la ventana en la pantalla
         
-        
         // listeners
         sendButton.addActionListener((ActionEvent e) -> {
             sendMessage();
         });
-        exitButton.addActionListener((ActionEvent e)->
-        {
+        exitButton.addActionListener((ActionEvent e) -> {
             exitGroup(groupId, userId);
         });
-        actions.addActionListener((ActionEvent e)->
-        {
-            mandarAjustesGrupos();
+        actions.addActionListener((ActionEvent e) -> {
+            mandarAjustesGrupos(groupId);
         });
     }
     
@@ -131,13 +107,11 @@ public class ChatGrupal extends JFrame{
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
             int chatId = chatsController.GetChatId(userId, chatterId);
-            if (chatId == -1)
-            {
+            if (chatId == -1) {
                 registroExitoso = chatsController.CreateChat(userId, chatterId);
             }
             
-            if (registroExitoso)
-            {
+            if (registroExitoso) {
                 chatId = chatsController.GetChatId(userId, chatterId);
             }            
             
@@ -147,61 +121,76 @@ public class ChatGrupal extends JFrame{
 
     private void exitGroup(int grupoId, int userId) {
         GruposController gruposController = new GruposController(ip);
+        
         boolean isOwner = gruposController.selectDuenoId(grupoId, userId);
-        if(isOwner)
-        {
-            gruposController.deleteMensajesGrupos(grupoId);
-            boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
-            if(comprobar)
-            {
-                gruposController.deleteGrupo(grupoId);
-                dispose();
-                ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
-                listasGrupos.setVisible(true);
-            }
-        } else
-        {
-            int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);
-            System.out.println("participantes es: " + cantidadParticipantes);
-            if(cantidadParticipantes<2)
-            {
-                System.out.println("entra minimo participantes");
-                boolean borradoMensajes = gruposController.deleteMensajesGrupos(grupoId);
+        if (isOwner) {
+            int response = JOptionPane.showConfirmDialog(
+                ChatGrupal.this,
+                "¿Estás seguro de que deseas salir del grupo? Borrará todo debido a que eres el dueño.",
+                "Confirmación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (response == JOptionPane.YES_OPTION) {
+                gruposController.deleteMensajesGrupos(grupoId);
                 boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
-                if(comprobar)
-                {
-                    System.out.println("comprobacion");
-                    boolean verificar = gruposController.deleteGrupo(grupoId);
+                if (comprobar) {
+                    gruposController.deleteGrupo(grupoId);
+                    dispose();
+                    ListaGrupos listasGrupos = new ListaGrupos(userId, ip);
+                    listasGrupos.setVisible(true);
                 }
-            } else
-            {
-                System.out.println("entra solo el solito");
-                gruposController.deleteUsuarioRecibeId(grupoId, userId);
             }
-            dispose();
-            ListaGrupos view = new ListaGrupos(userId, ip);
-            view.setVisible(true);
+        } else {
+            int response = JOptionPane.showConfirmDialog(
+                ChatGrupal.this,
+                "¿Estás seguro de que deseas salir de este grupo?",
+                "Confirmación",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (response == JOptionPane.YES_OPTION) {
+                int cantidadParticipantes = gruposController.selectCuentaParticipantes(grupoId);
+                System.out.println("participantes es: " + cantidadParticipantes);
+                if (cantidadParticipantes <= 2) {
+                    System.out.println("entra minimo participantes");
+                    gruposController.deleteMensajesGrupos(grupoId);
+                    boolean comprobar = gruposController.deleteInvitacionesGrupos(grupoId);
+                    if (comprobar) {
+                        System.out.println("comprobacion");
+                        gruposController.deleteGrupo(grupoId);
+                    }
+                } else {
+                    /*System.out.println("entra solo el solito");
+                    gruposController.deleteUsuarioRecibeId(grupoId, userId);*/
+                }
+                dispose();
+                ListaGrupos view = new ListaGrupos(userId, ip);
+                view.setVisible(true);
+            }
         }
     }
     
-    private void mandarAjustesGrupos()
-    {
-        /*AjustesGrupos view = new AjustesGrupos(userId, groupId, ip);
-        view.setVisible(true);
-        dispose();*/
+    private void mandarAjustesGrupos(int grupoId) {
+        GruposController gruposController = new GruposController(ip);
+        AjustesGrupos view = new AjustesGrupos(userId, groupId, ip);
+                view.setVisible(true);
+                dispose();
     }
+    
     private void addWindowListener() {
         // Crear una instancia del WindowListener
         WindowListener windowListener = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 // Aquí puedes redirigir al usuario a la ventana ListasMenu y pasar el parámetro userId
-                ListaConectados listasConectados = new ListaConectados(userId, ip);
+                ListaGrupos listasConectados = new ListaGrupos(userId, ip);
                 listasConectados.setVisible(true);
             }
         };
 
         this.addWindowListener(windowListener);
     }
-    
 }
