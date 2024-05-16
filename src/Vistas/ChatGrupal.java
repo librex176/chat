@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package Vistas;
 
 import Controllers.ChatsController;
@@ -25,10 +22,6 @@ import javax.swing.LayoutStyle;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import Vistas.ListaGrupos;
 
-/**
- *
- * @author aacar
- */
 public class ChatGrupal extends JFrame{
     
     int userId;
@@ -36,6 +29,7 @@ public class ChatGrupal extends JFrame{
     String ip;
     private JTextArea chatArea;
     private JTextField messageField;
+    
     MessagesController messagesController = new MessagesController();
     
     public ChatGrupal(int userId, int groupId, String ip)
