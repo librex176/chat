@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.List;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,6 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import models.GroupMessage;
+import models.Message;
 
 public class ChatGrupal extends JFrame{
     
@@ -26,6 +30,7 @@ public class ChatGrupal extends JFrame{
     String ip;
     private JTextArea chatArea;
     private JTextField messageField;
+    private Thread listenerThread;
     
     MessagesController messagesController = new MessagesController();
     
@@ -36,6 +41,7 @@ public class ChatGrupal extends JFrame{
         this.ip = ip;
         init();
         addWindowListener();
+        startMessageListener();
     }
     
     private void init() {
@@ -101,22 +107,53 @@ public class ChatGrupal extends JFrame{
     }
     
     private void sendMessage() {
-        /*String message = messageField.getText();
+        String message = messageField.getText();
+        System.out.println(message);
         boolean registroExitoso = false;
         if (!message.isEmpty()) {
             chatArea.append("You: " + message + "\n");
             messageField.setText("");
-            int chatId = chatsController.GetChatId(userId, chatterId);
-            if (chatId == -1) {
-                registroExitoso = chatsController.CreateChat(userId, chatterId);
+            
+            messagesController.SendMessageToServerGroups(message, groupId, userId, ip);
+        }
+    }
+
+    private void startMessageListener() {
+        listenerThread = new Thread(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    Thread.sleep(1500);
+
+                    // clear chat area before updating it
+                    SwingUtilities.invokeLater(() -> {
+                        chatArea.setText("");
+                    });
+
+                    // get messages from server with query (getMessages)
+                    List<GroupMessage> mensajesChatGrupales = messagesController.GetMessagesGroup(groupId, ip);
+
+                    // update chat area
+                    SwingUtilities.invokeLater(() -> {
+                        for (GroupMessage groupMessage : mensajesChatGrupales) {
+                            int senderId = groupMessage.getUserId();
+                            String messageContent = groupMessage.getMessageContent();
+
+                            if (senderId == userId) {
+                                chatArea.append("You: " + messageContent + "\n");
+                            } else {
+                                chatArea.append(messageContent + "\n");
+                            }
+                        }
+                    });
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restore the interrupted status
+                    break; // Exit the loop if interrupted
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            
-            if (registroExitoso) {
-                chatId = chatsController.GetChatId(userId, chatterId);
-            }            
-            
-            messagesController.SendMessageToBD(message, chatId, userId);
-        }*/
+        });
+        listenerThread.start();
     }
 
     private void exitGroup(int grupoId, int userId) {
